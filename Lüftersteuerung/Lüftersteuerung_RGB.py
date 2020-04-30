@@ -1,5 +1,5 @@
 # Lüftersteuerung
-# Version 0.1
+# Version 0.2
 # Geschrieben von: Fabian Riegeer
 
 # Bibliotheken importieren
@@ -7,12 +7,10 @@ import RPi.GPIO as GPIO
 import time
 
 # Variablen
-# Lüfter Startwert
-fan = 0
-# Nachlaufzeit Lüfter
-timer = 10
-# Intervall Messungen
-sec = 1
+fan = -1                     # Lüfter Startwert aus (0)
+sec = 2                     # Intervall für Messungen in Sekunden
+timer = 20                  # Nachlaufzeit Lüfter wenn rote LED aus in Sekunden
+fan_on = int(timer/sec)     # Berechnung für Lüfternachlaufzeit
 
 # Temperaturen
 normal = 56
@@ -46,7 +44,7 @@ while 1:
 
     # Zustandsabfrage für LED und Lüfter
     # Abfrage bei Lüfter aus
-    if fan == 0:
+    if fan == -1:
         if temperatur <= normal:
             GPIO.output(23, GPIO.LOW)
             GPIO.output(24, GPIO.HIGH)
@@ -62,7 +60,7 @@ while 1:
             GPIO.output(24, GPIO.LOW)
             GPIO.output(25, GPIO.LOW)
             GPIO.output(17, GPIO.HIGH)
-            fan = 1
+            fan = 0
     # Abfrage bei Lüfter an
     else:
         fan += 1
@@ -81,16 +79,17 @@ while 1:
             GPIO.output(24, GPIO.LOW)
             GPIO.output(25, GPIO.LOW)
             GPIO.output(17, GPIO.HIGH)
-            fan = 1
+            fan = 0
 
     # Lüfter nachlaufen lassen
-    if fan == timer and GPIO.input(23) == GPIO.HIGH:
+    if fan > fan_on and GPIO.input(23) == GPIO.HIGH \
+            and GPIO.input(24) == GPIO.HIGH:
         GPIO.output(17, GPIO.LOW)
-        fan = 0
+        fan = -1
 
     # Ausgabe Lüfternachlauf
-    if fan != 0:
-        print(fan)
+    if fan != -1:
+        print(fan * sec, "Sek.")
 
     # Zeit zwischen erneuter Abfrage
     time.sleep(sec)
