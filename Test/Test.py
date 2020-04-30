@@ -7,6 +7,6 @@ GPIO.setup(17, GPIO.OUT)
 
 GPIO.output(2, GPIO.LOW)
 GPIO.output(3, GPIO.LOW)
-GPIO.output(4, GPIO.HIGH)
+GPIO.output(4, GPIO.LOW)
 GPIO.output(17, GPIO.LOW)
 # GPIO.cleanup()
