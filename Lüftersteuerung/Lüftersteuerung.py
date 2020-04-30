@@ -3,7 +3,7 @@
 # Geschrieben von: Fabian Riegeer
 
 # Bibliotheken importieren
-#import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import time
 from RPi import GPIO
 
@@ -39,23 +39,23 @@ while 1:
 
     # Zustandsabfrage
     if temperatur <= normal:
-        #print("Grüne LED")
+        # print("Grüne LED")
         GPIO.output(2, GPIO.HIGH)
         GPIO.output(3, GPIO.LOW)
         GPIO.output(4, GPIO.LOW)
         GPIO.output(17, GPIO.LOW)
 
-        #time.sleep(10)
+        # time.sleep(10)
     elif temperatur > normal and temperatur <= heiss:
-        #print("Grüne + gelbe LED")
+        # print("Grüne + gelbe LED")
         GPIO.output(2, GPIO.HIGH)
         GPIO.output(3, GPIO.HIGH)
         GPIO.output(4, GPIO.LOW)
         GPIO.output(17, GPIO.LOW)
 
-        #time.sleep(10)
+        # time.sleep(10)
     elif temperatur >= heiss:
-        #print("Rote LED + Lüfter")
+        # print("Rote LED + Lüfter")
         GPIO.output(2, GPIO.LOW)
         GPIO.output(3, GPIO.LOW)
         GPIO.output(4, GPIO.HIGH)
