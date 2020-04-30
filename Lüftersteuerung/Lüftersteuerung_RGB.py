@@ -82,6 +82,7 @@ while 1:
         GPIO.output(17, GPIO.LOW)
         fan = 0
 
-    print(fan)
+    if fan != 0:
+        print(fan)
     time.sleep(1)
 GPIO.cleanup()
