@@ -1,98 +1,126 @@
 # Lüftersteuerung
-# Version 0.2
+# Version 0.3
 # Geschrieben von: Fabian Riegeer
 
 # Bibliotheken importieren
 import RPi.GPIO as GPIO
 import time
 
-# Variablen
-fan = -1                     # Lüfter Startwert aus (0)
-sec = 2                     # Intervall für Messungen in Sekunden
-timer = 20                  # Nachlaufzeit Lüfter wenn rote LED aus in Sekunden
-fan_on = int(timer/sec)     # Berechnung für Lüfternachlaufzeit
 
-# Temperaturen
-normal = 56
-warm = 58
-heiss = 60
+def GPIO_start():               # GPIO Startwerte
+    GPIO.setmode(GPIO.BCM)      # Auswahl Pinbelegung
+    GPIO.setwarnings(False)     # Warnungen Pinbelegung/-zustand
+    GPIO.setup(23, GPIO.OUT)    # LED rot
+    GPIO.setup(24, GPIO.OUT)    # LED grün
+    GPIO.setup(25, GPIO.OUT)    # LED blau
+    GPIO.setup(17, GPIO.OUT)    # Lüfter 1
+    GPIO.setup(4, GPIO.OUT)     # Lüfter 2
 
-# GPIO Startwerte setzen
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(23, GPIO.OUT)  # LED rot
-GPIO.setup(24, GPIO.OUT)  # LED grün
-GPIO.setup(25, GPIO.OUT)  # LED blau
-GPIO.setup(17, GPIO.OUT)  # Lüfter
+    GPIO.output(23, GPIO.LOW)   # GPIO auf 0 setzen
+    GPIO.output(24, GPIO.LOW)
+    GPIO.output(25, GPIO.LOW)
+    GPIO.output(4, GPIO.LOW)
+    GPIO.output(17, GPIO.LOW)
 
-# GPIO auf 0 setzen
-GPIO.output(23, GPIO.LOW)
-GPIO.output(24, GPIO.LOW)
-GPIO.output(25, GPIO.LOW)
-GPIO.output(17, GPIO.LOW)
 
-# Programmstart
-while 1:
+class LED:                      # Module LED Zustand
 
-    # Temperatur abfragen, umwandeln und ausgeben
-    tempData = "/sys/class/thermal/thermal_zone0/temp"
-    dateilesen = open(tempData, "r")
-    temperatur = dateilesen.readline(2)
-    dateilesen.close()
-    print("Deine CPU hat " + temperatur + " Grad")
-    temperatur = int(temperatur)
+    def green():                # LED grün
+        GPIO.output(23, GPIO.LOW)
+        GPIO.output(24, GPIO.HIGH)
+        GPIO.output(25, GPIO.LOW)
 
-    # Zustandsabfrage für LED und Lüfter
-    # Abfrage bei Lüfter aus
-    if fan == -1:
-        if temperatur <= normal:
-            GPIO.output(23, GPIO.LOW)
-            GPIO.output(24, GPIO.HIGH)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.LOW)
-        elif temperatur > normal and temperatur < heiss:
-            GPIO.output(23, GPIO.HIGH)
-            GPIO.output(24, GPIO.HIGH)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.LOW)
-        elif temperatur >= heiss:
-            GPIO.output(23, GPIO.HIGH)
-            GPIO.output(24, GPIO.LOW)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.HIGH)
-            fan = 0
-    # Abfrage bei Lüfter an
-    else:
-        fan += 1
-        if temperatur <= normal:
-            GPIO.output(23, GPIO.LOW)
-            GPIO.output(24, GPIO.HIGH)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.HIGH)
-        elif temperatur > normal and temperatur < heiss:
-            GPIO.output(23, GPIO.HIGH)
-            GPIO.output(24, GPIO.HIGH)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.HIGH)
-        elif temperatur >= heiss:
-            GPIO.output(23, GPIO.HIGH)
-            GPIO.output(24, GPIO.LOW)
-            GPIO.output(25, GPIO.LOW)
-            GPIO.output(17, GPIO.HIGH)
-            fan = 0
+    def yellow():               # LED gelb
+        GPIO.output(23, GPIO.HIGH)
+        GPIO.output(24, GPIO.HIGH)
+        GPIO.output(25, GPIO.LOW)
 
-    # Lüfter nachlaufen lassen
-    if fan > fan_on and GPIO.input(23) == GPIO.HIGH \
-            and GPIO.input(24) == GPIO.HIGH:
+    def red():                  # LED rot
+        GPIO.output(23, GPIO.HIGH)
+        GPIO.output(24, GPIO.LOW)
+        GPIO.output(25, GPIO.LOW)
+
+
+class fan:                      # Module Lüfter
+
+    def off():                  # Lüfter aus
         GPIO.output(17, GPIO.LOW)
-        fan = -1
+        GPIO.output(4, GPIO.LOW)
+
+    def one():                  # Nur Lüfter 1 an
+        GPIO.output(17, GPIO.HIGH)
+        GPIO.output(4, GPIO.LOW)
+
+    def two():                  # Lüfter 1 + 2 an
+        GPIO.output(17, GPIO.HIGH)
+        GPIO.output(4, GPIO.HIGH)
+
+
+GPIO_start()                    # GPIO auf Startwerte setzen
+
+# Variablen
+fantime = -1                    # Lüfter 1 Startwert aus (-1)
+fantime2 = -1                   # Lüfter 2 Startwert aus (-1)
+
+sec = 2                         # Intervall zwischen Messungen in Sekunden
+timer = 20                      # Nachlaufzeit Lüfter wenn rote LED aus (Sek.)
+fan_on = int(timer/sec)         # Berechnung für Lüfternachlaufzeit
+
+normal = 54                     # Temperatur normal
+warm = 56                       # Temperatur warm
+hot = 58                        # Temperatur heiß
+
+while 1:                        # Schleife zur dauernden Abfrage starten
+
+    tempData = "/sys/class/thermal/thermal_zone0/temp"
+    readData = open(tempData, "r")              # Datei öffnen
+    temperature = readData.readline(2)          # Temperatur auslesen
+    readData.close()                            # Datei schließen
+    print("CPU hat " + temperature + " °C")     # Ausgabe Temperatur
+    temperature = int(temperature)              # Temperatur als Zahl
+
+    # Zustandsabfrage LED + Lüfter
+    if fantime2 == -1:                          # wenn Lüfter 2 aus
+        if temperature <= normal:
+            LED.green()
+            if fantime != -1 and fantime != 0:  # wenn Lüfter 1 an
+                fan.one()                       # Nur Lüfter 1 an
+                fantime -= 1                    # Lüfter 1 Zähler -1
+            else:                               # wenn Lüfter 1 aus
+                fan.off()                       # beide Lüfter aus
+                fantime = -1                    # Lüfter 1 Zähler zurücksetzen
+        elif temperature > normal and temperature < hot:
+            LED.yellow()
+            fan.one()                           # Nur Lüfter 1 an
+            fantime = 10                        # Nachlaufzeit Lüfter 1
+        elif temperature >= hot:
+            LED.red()
+            fan.two()                           # beide Lüfter an
+            fantime2 = 0                        # Lüfter 2 Zähler auf 0
+            fantime = fantime2                  # Lüfter 1 Zähler auf 0
+    elif fantime2 != -1:                        # wenn Lüfter 2 an
+        fantime += 1                            # Lüfter 1 Zähler +1
+        fantime2 += 1                           # Lüfter 2 Zähler +1
+        if temperature <= normal:
+            LED.green()
+        elif temperature > normal and temperature < hot:
+            LED.yellow()
+        elif temperature >= hot:
+            fantime2 = 0                        # Lüfter 2 Zähler auf 0
+            fantime = fantime2                  # Lüfter Zähler gleichsetzen
+
+    # Lüfter 2 nachlaufen lassen
+    if fantime2 > fan_on and GPIO.input(23) == GPIO.HIGH \
+            and GPIO.input(24) == GPIO.HIGH:
+        fantime2 = -1                           # Lüfter 2 Zähler zurücksetzen
 
     # Ausgabe Lüfternachlauf
-    if fan != -1:
-        print(fan * sec, "Sek.")
+    if fantime2 != -1:                          # wenn Lüfter 2 Zähler nicht -1
+        print("Fan 1", fantime * sec, "Sek.")   # Ausgabe Lüfter 1 Zähler
+        print("Fan 2", fantime2 * sec, "Sek.")  # Ausgabe Lüfter 2 Zähler
+    elif fantime != -1:                         # wenn Lüfter 1 Zähler nicht -1
+        print("Fan 1", fantime * sec, "Sek.")   # Ausgabe Lüfter 1 Zähler
 
-    # Zeit zwischen erneuter Abfrage
-    time.sleep(sec)
+    time.sleep(sec)                             # Intervall Abstand
 
-# GPIO Zustand zurücksetzen
-GPIO.cleanup()
+GPIO.cleanup()                                  # GPIO zurücksetzen
