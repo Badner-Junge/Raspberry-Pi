@@ -260,7 +260,11 @@ guess.set("")
 guesslist = []                                                                              # Eingaben Liste
 guesslist_correct = []                                                                      # Eingaben Liste gültig
 versuch = 0                                                                                 # Versuchszähler
-image = ["neutral.png", "green-near.png", "green-far.png", "red-near.png", "red-far.png"]   # Bild
+image = ["/home/pi/Documents/Raspberry-Pi/Spielesammlung/Spielesammlung_mit_GUI/pictures/neutral.png",
+        "/home/pi/Documents/Raspberry-Pi/Spielesammlung/Spielesammlung_mit_GUI/pictures/green-near.png",
+        "/home/pi/Documents/Raspberry-Pi/Spielesammlung/Spielesammlung_mit_GUI/pictures/green-far.png",
+        "/home/pi/Documents/Raspberry-Pi/Spielesammlung/Spielesammlung_mit_GUI/pictures/red-near.png",
+        "/home/pi/Documents/Raspberry-Pi/Spielesammlung/Spielesammlung_mit_GUI/pictures/red-far.png"]   # Bild
 pic = 0                                                                                     # Bilderauswahl
 hint_counter = 2                                                                            # Hinweiszähler
 hint_add = []                                                                               # Hinweis hinzufügen
