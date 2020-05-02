@@ -62,13 +62,13 @@ GPIO_start()                    # GPIO auf Startwerte setzen
 fantime = -1                    # Lüfter 1 Startwert aus (-1)
 fantime2 = -1                   # Lüfter 2 Startwert aus (-1)
 
-sec = 2                         # Intervall zwischen Messungen in Sekunden
-timer = 20                      # Nachlaufzeit Lüfter wenn rote LED aus (Sek.)
+sec = 5                         # Intervall zwischen Messungen in Sekunden
+timer = 30                      # Nachlaufzeit Lüfter wenn rote LED aus (Sek.)
 fan_on = int(timer/sec)         # Berechnung für Lüfternachlaufzeit
 
-normal = 54                     # Temperatur normal
-warm = 56                       # Temperatur warm
-hot = 58                        # Temperatur heiß
+normal = 55                     # Temperatur normal
+warm = 60                       # Temperatur warm
+hot = 65                        # Temperatur heiß
 
 while 1:                        # Schleife zur dauernden Abfrage starten
 
@@ -92,7 +92,7 @@ while 1:                        # Schleife zur dauernden Abfrage starten
         elif temperature > normal and temperature < hot:
             LED.yellow()
             fan.one()                           # Nur Lüfter 1 an
-            fantime = 10                        # Nachlaufzeit Lüfter 1
+            fantime = 6                         # Nachlaufintervalle Lüfter 1
         elif temperature >= hot:
             LED.red()
             fan.two()                           # beide Lüfter an
