@@ -6,7 +6,7 @@ from time import sleep
 breakS = 0.1
 breakL = 0.5
 
-serial_port = serial.Serial()
+serial_port = Serial.serial()
 
 serial_port.baudrate = 38400
 serial_port.port = "/dev/serial0"
