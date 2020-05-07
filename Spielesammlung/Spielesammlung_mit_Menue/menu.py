@@ -6,16 +6,19 @@
 # Import Module
 import random
 from colorama import init, Fore
-init(autoreset=True)                                # Farbe automatisch zurücksetzen
+init(autoreset=True)                           # Farbe automatisch zurücksetzen
+
 
 # Funktionen
 def seperator():
     # Trennlinie
     print("****************************************")
 
+
 def clear_line():
     # Leerzeile
     print()
+
 
 def choice_game():
     # Auswahl Spiel
@@ -54,7 +57,7 @@ def choice_game():
         else:
             print(Fore.CYAN + "-----------------------------------------")
             choice = 9999
-            print(Fore.LIGHTCYAN_EX + "***** Schade! Bis zum nächsten Mal! *****")
+            print(Fore.LIGHTCYAN_EX + "*** Schade! Bis zum nächsten Mal! ***")
             print(Fore.CYAN + "-----------------------------------------")
 
     except:
@@ -66,6 +69,7 @@ def choice_game():
             choice = 9999
             clear_line()
             main_menu()
+
 
 def main_menu():
     # Hauptmenü
@@ -740,10 +744,14 @@ class games:
                     # Ausgabe Ergebnis
                     if win > loose:
                         seperator()
-                        print("Super, du hast " + Fore.GREEN + str(win) + Fore.RESET + " zu " + Fore.RED + str(loose) + Fore.RESET + " gewonnen!")
+                        print("Super, du hast " + Fore.GREEN + str(win) + \
+                            Fore.RESET + " zu " + Fore.RED + str(loose) + \
+                                Fore.RESET + " gewonnen!")
                     elif loose > win:
                         seperator()
-                        print("Schade, du hast " + Fore.GREEN + str(win) + Fore.RESET + " zu " + Fore.RED + str(loose) + Fore.RESET + " verloren!")
+                        print("Schade, du hast " + Fore.GREEN + str(win) + \
+                            Fore.RESET + " zu " + Fore.RED + str(loose) + \
+                                Fore.RESET + " verloren!")
 
                 # Wiederholung
                 seperator()
@@ -785,5 +793,6 @@ class games:
     def scoreboard():
         print("Noch in Arbeit")
         main_menu()
+
 
 main_menu()

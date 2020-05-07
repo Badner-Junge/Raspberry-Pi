@@ -55,20 +55,28 @@ class fan:                      # Module Lüfter
         GPIO.output(17, GPIO.HIGH)
         GPIO.output(4, GPIO.HIGH)
 
+    def fan1_runon():
+        if fantime != -1 and fantime != 0:
+            fan.one()
+            fantime -= 1
+        else:
+            fan.off()
+            fantime = -1
+
 
 GPIO_start()                    # GPIO auf Startwerte setzen
 
 # Variablen
-fantime = -1                    # Lüfter 1 Startwert aus (-1)
-fantime2 = -1                   # Lüfter 2 Startwert aus (-1)
+fantime = -1                        # Lüfter 1 Startwert aus (-1)
+fantime2 = -1                       # Lüfter 2 Startwert aus (-1)
 
 sec = 5                         # Intervall zwischen Messungen in Sekunden
 timer = 30                      # Nachlaufzeit Lüfter wenn rote LED aus (Sek.)
 fan_on = int(timer/sec)         # Berechnung für Lüfternachlaufzeit
 
-normal = 55                     # Temperatur normal
-warm = 60                       # Temperatur warm
-hot = 65                        # Temperatur heiß
+normal = 49                     # Temperatur normal
+warm = 51                       # Temperatur warm
+hot = 53                        # Temperatur heiß
 
 while 1:                        # Schleife zur dauernden Abfrage starten
 
@@ -83,7 +91,7 @@ while 1:                        # Schleife zur dauernden Abfrage starten
     if fantime2 == -1:                          # wenn Lüfter 2 aus
         if temperature <= normal:
             LED.green()
-            if fantime != -1 and fantime != 0:  # wenn Lüfter 1 an
+            if fantime != -1 and fan != 0:      # wenn Lüfter 1 an
                 fan.one()                       # Nur Lüfter 1 an
                 fantime -= 1                    # Lüfter 1 Zähler -1
             else:                               # wenn Lüfter 1 aus
@@ -92,12 +100,12 @@ while 1:                        # Schleife zur dauernden Abfrage starten
         elif temperature > normal and temperature < hot:
             LED.yellow()
             fan.one()                           # Nur Lüfter 1 an
-            fantime = 6                         # Nachlaufintervalle Lüfter 1
+            fantime = fan_on                    # Nachlaufintervalle Lüfter 1
         elif temperature >= hot:
             LED.red()
             fan.two()                           # beide Lüfter an
             fantime2 = 0                        # Lüfter 2 Zähler auf 0
-            fantime = fantime2                  # Lüfter 1 Zähler auf 0
+            fantime = 0                         # Lüfter 1 Zähler auf 0
     elif fantime2 != -1:                        # wenn Lüfter 2 an
         fantime += 1                            # Lüfter 1 Zähler +1
         fantime2 += 1                           # Lüfter 2 Zähler +1
@@ -106,13 +114,8 @@ while 1:                        # Schleife zur dauernden Abfrage starten
         elif temperature > normal and temperature < hot:
             LED.yellow()
         elif temperature >= hot:
-            fantime2 = 0                        # Lüfter 2 Zähler auf 0
-            fantime = fantime2                  # Lüfter Zähler gleichsetzen
-
-    # Lüfter 2 nachlaufen lassen
-    if fantime2 > fan_on and GPIO.input(23) == GPIO.HIGH \
-            and GPIO.input(24) == GPIO.HIGH:
-        fantime2 = -1                           # Lüfter 2 Zähler zurücksetzen
+            fantime = 0                         # Lüfter 2 Zähler auf 0
+            fantime2 = 0                        # Lüfter Zähler gleichsetzen
 
     # Ausgabe Lüfternachlauf
     if fantime2 != -1:                          # wenn Lüfter 2 Zähler nicht -1
