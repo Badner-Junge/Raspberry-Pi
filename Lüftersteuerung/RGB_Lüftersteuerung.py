@@ -58,7 +58,7 @@ class fan:                      # Module Lüfter
 
 GPIO_start()                    # GPIO auf Startwerte setzen
 
-# Variablen
+# Konfiguration
 fantime = -1                    # Lüfter 1 Startwert aus (-1)
 fantime2 = -1                   # Lüfter 2 Startwert aus (-1)
 
