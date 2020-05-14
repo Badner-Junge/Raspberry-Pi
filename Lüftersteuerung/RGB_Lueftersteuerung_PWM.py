@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Lüftersteuerung PWM
-# Version 0.1
+# Version 0.2
 # Geschrieben von: Fabian Riegeer
 
 # Bibliotheken importieren
