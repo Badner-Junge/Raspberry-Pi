@@ -114,10 +114,10 @@ while 1:  # Schleife zur dauernden Abfrage starten
 
     # Ausgabe Lüfternachlauf
     if fantime2 != -1:  # wenn Lüfter 2 nicht -1
-        print("Fan 1", fantime * sec, "Sek." + "(", sec, ")")  # Ausgabe Lüfter 1
-        print("Fan 2", fantime2 * sec, "Sek." + "(", sec, ")")  # Ausgabe Lüfter 2
+        print("Fan 1", fantime * sec, "Sek." + "(", sec, ")")  # Zeit Lüfter 1
+        print("Fan 2", fantime2 * sec, "Sek." + "(", sec, ")")  # Zeit Lüfter 2
     elif fantime != -1:  # wenn Lüfter 1 nicht -1
-        print("Fan 1", fantime * sec, "Sek." + "(", sec, ")")  # Ausgabe Lüfter 1
+        print("Fan 1", fantime * sec, "Sek." + "(", sec, ")")  # Zeit Lüfter 1
 
     time.sleep(sec)  # Intervall Abstand
 
