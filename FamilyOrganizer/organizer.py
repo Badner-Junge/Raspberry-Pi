@@ -7,6 +7,12 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import os
+
+if os.environ.get("DISPLAY", "") == "":
+    print("no display found. Using :0.0")
+    os.environ.__setitem__("DISPLAY", ":0.0")
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -45,7 +51,9 @@ class Ui_MainWindow(object):
         self.meetings_checkboxLayout.setObjectName("meetings_checkboxLayout")
         self.meetings_checkboxFabienne = QtWidgets.QCheckBox(self.meetingsOverview)
         self.meetings_checkboxFabienne.setObjectName("meetings_checkboxFabienne")
-        self.meetings_checkboxLayout.addWidget(self.meetings_checkboxFabienne, 2, 0, 1, 1)
+        self.meetings_checkboxLayout.addWidget(
+            self.meetings_checkboxFabienne, 2, 0, 1, 1
+        )
         self.meetings_checkboxKatja = QtWidgets.QCheckBox(self.meetingsOverview)
         self.meetings_checkboxKatja.setObjectName("meetings_checkboxKatja")
         self.meetings_checkboxLayout.addWidget(self.meetings_checkboxKatja, 0, 0, 1, 1)
@@ -208,7 +216,9 @@ class Ui_MainWindow(object):
         self.mainLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.mainLabel.setObjectName("mainLabel")
         self.gridLayout.addWidget(self.mainLabel, 0, 2, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.gridLayout.addItem(spacerItem, 0, 1, 2, 1)
         self.pageWidget.addWidget(self.mainPage)
         self.mainChildren = QtWidgets.QWidget()
@@ -283,7 +293,9 @@ class Ui_MainWindow(object):
         self.gridLayout_8 = QtWidgets.QGridLayout(self.shoppinglist_buttonsLayout)
         self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_8.setObjectName("gridLayout_8")
-        self.shoppinglist_buttonsPlus = QtWidgets.QPushButton(self.shoppinglist_buttonsLayout)
+        self.shoppinglist_buttonsPlus = QtWidgets.QPushButton(
+            self.shoppinglist_buttonsLayout
+        )
         self.shoppinglist_buttonsPlus.setMinimumSize(QtCore.QSize(70, 70))
         self.shoppinglist_buttonsPlus.setMaximumSize(QtCore.QSize(70, 70))
         font = QtGui.QFont()
@@ -293,7 +305,9 @@ class Ui_MainWindow(object):
         self.shoppinglist_buttonsPlus.setFont(font)
         self.shoppinglist_buttonsPlus.setObjectName("shoppinglist_buttonsPlus")
         self.gridLayout_8.addWidget(self.shoppinglist_buttonsPlus, 0, 0, 1, 2)
-        self.shoppinglist_buttonsMinus = QtWidgets.QPushButton(self.shoppinglist_buttonsLayout)
+        self.shoppinglist_buttonsMinus = QtWidgets.QPushButton(
+            self.shoppinglist_buttonsLayout
+        )
         self.shoppinglist_buttonsMinus.setMinimumSize(QtCore.QSize(70, 70))
         self.shoppinglist_buttonsMinus.setMaximumSize(QtCore.QSize(70, 70))
         font = QtGui.QFont()
@@ -303,19 +317,27 @@ class Ui_MainWindow(object):
         self.shoppinglist_buttonsMinus.setFont(font)
         self.shoppinglist_buttonsMinus.setObjectName("shoppinglist_buttonsMinus")
         self.gridLayout_8.addWidget(self.shoppinglist_buttonsMinus, 2, 0, 1, 2)
-        self.shoppinglist_buttonsLCD = QtWidgets.QSpinBox(self.shoppinglist_buttonsLayout)
+        self.shoppinglist_buttonsLCD = QtWidgets.QSpinBox(
+            self.shoppinglist_buttonsLayout
+        )
         self.shoppinglist_buttonsLCD.setMinimumSize(QtCore.QSize(60, 70))
         self.shoppinglist_buttonsLCD.setMaximumSize(QtCore.QSize(60, 16777215))
         font = QtGui.QFont()
         font.setPointSize(30)
         self.shoppinglist_buttonsLCD.setFont(font)
         self.shoppinglist_buttonsLCD.setAlignment(QtCore.Qt.AlignCenter)
-        self.shoppinglist_buttonsLCD.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.shoppinglist_buttonsLCD.setButtonSymbols(
+            QtWidgets.QAbstractSpinBox.NoButtons
+        )
         self.shoppinglist_buttonsLCD.setObjectName("shoppinglist_buttonsLCD")
         self.gridLayout_8.addWidget(self.shoppinglist_buttonsLCD, 1, 0, 1, 1)
-        self.shoppinglist_buttonsMoveinlist = QtWidgets.QPushButton(self.shoppinglist_buttonsLayout)
+        self.shoppinglist_buttonsMoveinlist = QtWidgets.QPushButton(
+            self.shoppinglist_buttonsLayout
+        )
         self.shoppinglist_buttonsMoveinlist.setMaximumSize(QtCore.QSize(70, 16777215))
-        self.shoppinglist_buttonsMoveinlist.setObjectName("shoppinglist_buttonsMoveinlist")
+        self.shoppinglist_buttonsMoveinlist.setObjectName(
+            "shoppinglist_buttonsMoveinlist"
+        )
         self.gridLayout_8.addWidget(self.shoppinglist_buttonsMoveinlist, 3, 0, 1, 1)
         self.gridLayout_7.addWidget(self.shoppinglist_buttonsLayout, 1, 1, 1, 1)
         self.shoppinglistChoise = QtWidgets.QTreeWidget(self.mainShopping_list)
@@ -355,7 +377,9 @@ class Ui_MainWindow(object):
         self.shoppinglistLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.shoppinglistLabel.setObjectName("shoppinglistLabel")
         self.gridLayout_7.addWidget(self.shoppinglistLabel, 0, 0, 1, 4)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.gridLayout_7.addItem(spacerItem1, 1, 2, 1, 1)
         self.pageWidget.addWidget(self.mainShopping_list)
         self.mainRecipes = QtWidgets.QWidget()
@@ -406,9 +430,13 @@ class Ui_MainWindow(object):
         self.pageWidget.setCurrentIndex(0)
         self.mainOverview.setCurrentIndex(2)
         self.childrenTabs.setCurrentIndex(0)
-        self.wood_inputDial.sliderMoved['int'].connect(self.wood_inputDisplay.display)
-        self.shoppinglist_buttonsPlus.clicked.connect(self.shoppinglist_buttonsLCD.stepUp)
-        self.shoppinglist_buttonsMinus.pressed.connect(self.shoppinglist_buttonsLCD.stepDown)
+        self.wood_inputDial.sliderMoved["int"].connect(self.wood_inputDisplay.display)
+        self.shoppinglist_buttonsPlus.clicked.connect(
+            self.shoppinglist_buttonsLCD.stepUp
+        )
+        self.shoppinglist_buttonsMinus.pressed.connect(
+            self.shoppinglist_buttonsLCD.stepDown
+        )
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.mainbutton_children, self.mainbutton_calendar)
         MainWindow.setTabOrder(self.mainbutton_calendar, self.mainbutton_shopping_list)
@@ -416,11 +444,17 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.mainbutton_recipes, self.mainbutton_meal)
         MainWindow.setTabOrder(self.mainbutton_meal, self.calendarWidget)
         MainWindow.setTabOrder(self.calendarWidget, self.meetings_checkboxKatja)
-        MainWindow.setTabOrder(self.meetings_checkboxKatja, self.meetings_checkboxFabian)
+        MainWindow.setTabOrder(
+            self.meetings_checkboxKatja, self.meetings_checkboxFabian
+        )
         MainWindow.setTabOrder(self.meetings_checkboxFabian, self.meetings_checkboxMio)
         MainWindow.setTabOrder(self.meetings_checkboxMio, self.meetings_checkboxJona)
-        MainWindow.setTabOrder(self.meetings_checkboxJona, self.meetings_checkboxFabienne)
-        MainWindow.setTabOrder(self.meetings_checkboxFabienne, self.meetings_checkboxMika)
+        MainWindow.setTabOrder(
+            self.meetings_checkboxJona, self.meetings_checkboxFabienne
+        )
+        MainWindow.setTabOrder(
+            self.meetings_checkboxFabienne, self.meetings_checkboxMika
+        )
         MainWindow.setTabOrder(self.meetings_checkboxMika, self.meetingsList)
         MainWindow.setTabOrder(self.meetingsList, self.wood_graphicsView)
 
@@ -433,7 +467,10 @@ class Ui_MainWindow(object):
         self.meetings_checkboxMio.setText(_translate("MainWindow", "Mio"))
         self.meetings_checkboxJona.setText(_translate("MainWindow", "Jona"))
         self.meetings_checkboxMika.setText(_translate("MainWindow", "Mika"))
-        self.mainOverview.setItemText(self.mainOverview.indexOf(self.meetingsOverview), _translate("MainWindow", "Termine"))
+        self.mainOverview.setItemText(
+            self.mainOverview.indexOf(self.meetingsOverview),
+            _translate("MainWindow", "Termine"),
+        )
         item = self.childrenOverviewTable.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "Aufgabe"))
         item = self.childrenOverviewTable.verticalHeaderItem(1)
@@ -450,38 +487,78 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Mika"))
         item = self.childrenOverviewTable.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Jona"))
-        self.mainOverview.setItemText(self.mainOverview.indexOf(self.childrenOverview), _translate("MainWindow", "Kinder"))
+        self.mainOverview.setItemText(
+            self.mainOverview.indexOf(self.childrenOverview),
+            _translate("MainWindow", "Kinder"),
+        )
         self.wood_inputRadioButtonPiece.setText(_translate("MainWindow", "Päckchen"))
         self.wood_nputRadioButtonStack.setText(_translate("MainWindow", "Palette"))
         self.wood_inputPushButtonAgree.setText(_translate("MainWindow", "PushButton"))
-        self.mainOverview.setItemText(self.mainOverview.indexOf(self.woodOverview), _translate("MainWindow", "Holz"))
+        self.mainOverview.setItemText(
+            self.mainOverview.indexOf(self.woodOverview),
+            _translate("MainWindow", "Holz"),
+        )
         self.mainbutton_recipes.setText(_translate("MainWindow", "Rezepte"))
         self.mainbutton_shopping_list.setText(_translate("MainWindow", "Einkaufen"))
         self.mainbutton_children.setText(_translate("MainWindow", "Kinder"))
         self.mainbutton_calendar.setText(_translate("MainWindow", "Kalender"))
         self.mainbutton_meal.setText(_translate("MainWindow", "Essensplan"))
         self.mainLabel.setText(_translate("MainWindow", "Übersicht"))
-        self.childrenTabs.setTabText(self.childrenTabs.indexOf(self.childrenTabsFabienne), _translate("MainWindow", "Fabienne"))
-        self.childrenTabs.setTabText(self.childrenTabs.indexOf(self.childrenTabsMio), _translate("MainWindow", "Mio"))
-        self.childrenTabs.setTabText(self.childrenTabs.indexOf(self.childrenTabsMika), _translate("MainWindow", "Mika"))
-        self.childrenTabs.setTabText(self.childrenTabs.indexOf(self.childrenTabsJona), _translate("MainWindow", "Jona"))
+        self.childrenTabs.setTabText(
+            self.childrenTabs.indexOf(self.childrenTabsFabienne),
+            _translate("MainWindow", "Fabienne"),
+        )
+        self.childrenTabs.setTabText(
+            self.childrenTabs.indexOf(self.childrenTabsMio),
+            _translate("MainWindow", "Mio"),
+        )
+        self.childrenTabs.setTabText(
+            self.childrenTabs.indexOf(self.childrenTabsMika),
+            _translate("MainWindow", "Mika"),
+        )
+        self.childrenTabs.setTabText(
+            self.childrenTabs.indexOf(self.childrenTabsJona),
+            _translate("MainWindow", "Jona"),
+        )
         self.childrenLabel.setText(_translate("MainWindow", "Kinder"))
         self.calendarLabel.setText(_translate("MainWindow", "Kalender"))
         self.shoppinglist_buttonsPlus.setText(_translate("MainWindow", "+"))
         self.shoppinglist_buttonsMinus.setText(_translate("MainWindow", "-"))
-        self.shoppinglist_buttonsMoveinlist.setText(_translate("MainWindow", "zur Liste"))
-        self.shoppinglistChoise.headerItem().setText(0, _translate("MainWindow", "Was?"))
+        self.shoppinglist_buttonsMoveinlist.setText(
+            _translate("MainWindow", "zur Liste")
+        )
+        self.shoppinglistChoise.headerItem().setText(
+            0, _translate("MainWindow", "Was?")
+        )
         __sortingEnabled = self.shoppinglistChoise.isSortingEnabled()
         self.shoppinglistChoise.setSortingEnabled(False)
-        self.shoppinglistChoise.topLevelItem(0).setText(0, _translate("MainWindow", "Fleisch"))
-        self.shoppinglistChoise.topLevelItem(0).child(0).setText(0, _translate("MainWindow", "Salami"))
-        self.shoppinglistChoise.topLevelItem(0).child(1).setText(0, _translate("MainWindow", "Schnitzel"))
-        self.shoppinglistChoise.topLevelItem(1).setText(0, _translate("MainWindow", "Obst"))
-        self.shoppinglistChoise.topLevelItem(1).child(0).setText(0, _translate("MainWindow", "Apfel"))
-        self.shoppinglistChoise.topLevelItem(1).child(1).setText(0, _translate("MainWindow", "Banane"))
-        self.shoppinglistChoise.topLevelItem(2).setText(0, _translate("MainWindow", "Gemüse"))
-        self.shoppinglistChoise.topLevelItem(2).child(0).setText(0, _translate("MainWindow", "Paprika"))
-        self.shoppinglistChoise.topLevelItem(2).child(1).setText(0, _translate("MainWindow", "Gurke"))
+        self.shoppinglistChoise.topLevelItem(0).setText(
+            0, _translate("MainWindow", "Fleisch")
+        )
+        self.shoppinglistChoise.topLevelItem(0).child(0).setText(
+            0, _translate("MainWindow", "Salami")
+        )
+        self.shoppinglistChoise.topLevelItem(0).child(1).setText(
+            0, _translate("MainWindow", "Schnitzel")
+        )
+        self.shoppinglistChoise.topLevelItem(1).setText(
+            0, _translate("MainWindow", "Obst")
+        )
+        self.shoppinglistChoise.topLevelItem(1).child(0).setText(
+            0, _translate("MainWindow", "Apfel")
+        )
+        self.shoppinglistChoise.topLevelItem(1).child(1).setText(
+            0, _translate("MainWindow", "Banane")
+        )
+        self.shoppinglistChoise.topLevelItem(2).setText(
+            0, _translate("MainWindow", "Gemüse")
+        )
+        self.shoppinglistChoise.topLevelItem(2).child(0).setText(
+            0, _translate("MainWindow", "Paprika")
+        )
+        self.shoppinglistChoise.topLevelItem(2).child(1).setText(
+            0, _translate("MainWindow", "Gurke")
+        )
         self.shoppinglistChoise.setSortingEnabled(__sortingEnabled)
         item = self.shoppinglistList.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "1"))
@@ -501,10 +578,10 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
