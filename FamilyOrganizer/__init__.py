@@ -1,3 +1,7 @@
+# FamiliyOrganizer Main
+# Version: 0.1
+# Geschrieben von Fabian Rieger
+
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
@@ -46,10 +50,16 @@ class Root(Tk):
 
         self.tab_control = tabControl
 
+    def fullscreen_on(self):
+        self.attributes("-fullscreen", TRUE)
+
+    def fullscreen_off(self):
+        self.attributes("-fullscreen", FALSE)
+
     def end(self):
         root.destroy()
 
-    def createMenu(self):
+    def createMenu(self):e share
         menubar = Menu(self)
         self.config(menu=menubar)
 
@@ -59,9 +69,8 @@ class Root(Tk):
 
         visual_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Darstellung", menu=visual_menu)
-        visual_menu.add_command(
-            label="Vollbild", command=self.attributes("-fullscreen", False)
-        )
+        visual_menu.add_command(label="Vollbild", command=self.fullscreen_on)
+        visual_menu.add_command(label="Vollbild aus", command=self.fullscreen_off)
 
         help_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=help_menu)

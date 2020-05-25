@@ -18,8 +18,8 @@ FAN_1_PIN = 17  # Lüfter 1
 FAN_2_PIN = 4  # Lüfter 2
 
 # Mindestgeschwindigkeit Lüfter
-FAN_1_MIN = 0  # [%] Lüfter 1
-FAN_2_MIN = 0  # [%] Lüfter 2
+FAN_1_MIN = 30  # [%] Lüfter 1
+FAN_2_MIN = 30  # [%] Lüfter 2
 
 # Taktfrequenz und Intervallabstand
 PWM_FREQ = 50  # [Hz]
