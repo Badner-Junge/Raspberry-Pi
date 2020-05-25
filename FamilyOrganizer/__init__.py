@@ -2,7 +2,7 @@
 # Version: 0.1
 # Geschrieben von Fabian Rieger
 
-#!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from tkinter import *
@@ -59,7 +59,7 @@ class Root(Tk):
     def end(self):
         root.destroy()
 
-    def createMenu(self):e share
+    def createMenu(self):
         menubar = Menu(self)
         self.config(menu=menubar)
 
