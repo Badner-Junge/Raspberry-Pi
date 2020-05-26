@@ -1,6 +1,8 @@
-# FamiliyOrganizer Menü
-# Version: 0.1
-# Geschrieben von Fabian Rieger
+"""FamiliyOrganizer Menü.
+
+Version: 0.1
+Geschrieben von: Fabian Rieger
+"""
 
 # -*- coding: utf-8 -*-
 
@@ -8,17 +10,13 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox
 import tkinter as tk
-import os
-
-if os.environ.get("DISPLAY", "") == "":
-    print("no display found. Using :0.0")
-    os.environ.__setitem__("DISPLAY", ":0.0")
 
 
 class menuBar:
-    """Create Menubar"""
+    """Create Menubar."""
 
     def createMenu(self):
+        """Create Menu Categories."""
         menubar = Menu(self)
         self.config(menu=menubar)
 
@@ -35,11 +33,13 @@ class menuBar:
         menubar.add_cascade(label="Help", menu=help_menu)
         help_menu.add_command(label="About Us")
 
-    # def fullscreen_on(self):
-    #     self.attributes("-fullscreen", TRUE)
 
-    # def fullscreen_off(self):
-    #     self.attributes("-fullscreen", FALSE)
+class options:
+    """Option Settings."""
 
-    # def end(self):
-    #     root.destroy()
+    def fullscreen_toggle(self):
+        """Switch Fullscreen on/off."""
+        if self.attributes("-fullscreen") == FALSE:
+            self.attributes("-fullscreen", TRUE)
+        else:
+            self.attributes("-fullscreen", FALSE)
