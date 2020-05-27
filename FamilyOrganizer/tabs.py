@@ -54,11 +54,15 @@ class Addings:
     def Tab1(self):
         """Tab1."""
         Label(
-            self.tab1, text="Please Select your choice", font="Times 24 bold", fg="blue"
-        ).place(x=250, y=20)
+            self.tab1,
+            text="Please Select your choice",
+            font="Times 24 bold",
+            bg="red",
+            fg="blue",
+        ).grid(column=1, row=2)
         Label(
             self.tab1, text="Please Select your choice", font="Times 24 bold", fg="blue"
-        ).place(x=125, y=100)
+        ).grid(column=2, row=4)
 
     def Tab2(self):
         """Tab2."""

@@ -13,8 +13,9 @@ import tkinter as tk
 
 
 class Config:
-    """Style Settings"""
+    """Style Settings."""
 
     def Tabs(self):
+        """Tabs Position."""
         tabStyle = ttk.Style()
         tabStyle.configure("TNotebook", tabposition="w")
