@@ -10,6 +10,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox
 import tkinter as tk
+import config
 
 
 class menuBar:

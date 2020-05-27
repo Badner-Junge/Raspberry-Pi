@@ -10,6 +10,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox
 import tkinter as tk
+import config
 
 
 class Register:
@@ -55,6 +56,9 @@ class Addings:
         Label(
             self.tab1, text="Please Select your choice", font="Times 24 bold", fg="blue"
         ).place(x=250, y=20)
+        Label(
+            self.tab1, text="Please Select your choice", font="Times 24 bold", fg="blue"
+        ).place(x=125, y=100)
 
     def Tab2(self):
         """Tab2."""

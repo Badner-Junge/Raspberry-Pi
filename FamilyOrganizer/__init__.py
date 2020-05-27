@@ -12,7 +12,7 @@ from tkinter import ttk
 import tkinter.messagebox
 import tkinter as tk
 import os
-import menu, modules, tabs
+import menu, modules, tabs, config
 
 if os.environ.get("DISPLAY", "") == "":
     print("no display found. Using :0.0")
@@ -31,6 +31,7 @@ class Root(Tk):
         self.configure(background="white")
 
         menu.menuBar.createMenu(self)
+        config.Config.Tabs(self)
         tabs.Register.cards(self)
 
     def fullscreen_toggle(self):
