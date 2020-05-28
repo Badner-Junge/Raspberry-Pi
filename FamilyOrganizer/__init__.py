@@ -31,7 +31,7 @@ class Root(Tk):
         self.configure(background="white")
 
         menu.menuBar.createMenu(self)
-        config.Config.Tabs(self)
+        config.Tabs(self)
         tabs.Register.cards(self)
 
     def fullscreen_toggle(self):
