@@ -91,28 +91,76 @@ if os.environ.get("DISPLAY", "") == "":
 # root = Root()
 # root.mainloop()
 
-import tkinter as tk
-import tkinter.ttk as ttk
-from tkinter import *
-import tkcalendar
-from tkcalendar import Calendar, DateEntry
-import datetime
+
+""" Kalender."""
+# import tkinter as tk
+# import tkinter.ttk as ttk
+# from tkinter import *
+# import tkcalendar
+# from tkcalendar import Calendar, DateEntry
+# import datetime
+
+# root = tk.Tk()
+
+# events = {
+#     "2018-09-28": ("London", "meeting"),
+#     "2018-08-15": ("Paris", "meeting"),
+#     "2018-07-30": ("New York", "meeting"),
+# }
+
+# cal = Calendar(root, selectmode="day", year=2018, month=8)
+
+# for k in events.keys():
+#     date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
+#     cal.calevent_create(date, events[k][0], events[k][1])
+
+# cal.tag_config("meeting", background="red", foreground="yellow")
+# cal.pack(fill="both", expand=True)
+
+# root.mainloop()
+
+try:
+    # Python2
+    import Tkinter as tk
+    import ttk
+except ImportError:
+    # Python3
+    import tkinter as tk
+    import tkinter.ttk as ttk
 
 root = tk.Tk()
+# use width x height + x_offset + y_offset (no spaces!)
+root.geometry("%dx%d+%d+%d" % (300, 200, 100, 50))
+root.title("testing the ttk.Notebook")
 
-events = {
-    "2018-09-28": ("London", "meeting"),
-    "2018-08-15": ("Paris", "meeting"),
-    "2018-07-30": ("New York", "meeting"),
-}
+nb = ttk.Notebook(root)
+nb.pack(fill="both", expand="yes")
 
-cal = Calendar(root, selectmode="day", year=2018, month=8)
+# create a child frame for each page
+f1 = tk.Frame(bg="red")
+f2 = tk.Frame(bg="blue")
+f3 = tk.Frame(bg="green")
 
-for k in events.keys():
-    date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
-    cal.calevent_create(date, events[k][0], events[k][1])
+# create the pages, text goes on the tabs
+nb.add(f1, text="page1")
+nb.add(f2, text="page2")
+nb.add(f3, text="page3")
 
-cal.tag_config("meeting", background="red", foreground="yellow")
-cal.pack(fill="both", expand=True)
+# put a button widget on child frame f1 on page1
+button1 = tk.Button(f1, text="button1")
+button1.pack(side="left", anchor="nw", padx=3, pady=5)
+
+# put a combo box widget on child frame f2 on page2
+combo = ttk.Combobox(f2)
+shop_list = ["grapes", "pears", "onions"]
+combo["values"] = shop_list
+combo.set(shop_list[0])
+combo.pack(side="left", anchor="nw", padx=3, pady=5)
+
+# put something different into frame f3 on page3
+listbox = tk.Listbox(f3, bg="yellow")
+for item in shop_list:
+    listbox.insert("end", item)
+listbox.pack(side="left", anchor="nw", padx=3, pady=5)
 
 root.mainloop()

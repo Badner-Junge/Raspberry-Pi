@@ -26,29 +26,29 @@ class Register:
         tabControl = ttk.Notebook(self)
 
         self.tab1 = ttk.Frame(tabControl)
-        tabControl.add(self.tab1, text="Übersicht")
+        tabControl.add(self.tab1, text="Übersicht    ")
         Addings.Uebersicht(self)
         # print(tabControl.index(tabControl.select()))
 
         self.tab2 = ttk.Frame(tabControl)
-        tabControl.add(self.tab2, text="Kinder")
+        tabControl.add(self.tab2, text="Kinder         ")
         Addings.Kinder(self)
         # print(tabControl.tab(tabControl.select(), "text"))
 
         self.tab3 = ttk.Frame(tabControl)
-        tabControl.add(self.tab3, text="Kalender")
+        tabControl.add(self.tab3, text="Kalender     ")
         Addings.Kalender(self)
 
         self.tab4 = ttk.Frame(tabControl)
-        tabControl.add(self.tab4, text="Einkaufen")
+        tabControl.add(self.tab4, text="Einkaufen   ")
         Addings.Einkaufen(self)
 
         self.tab5 = ttk.Frame(tabControl)
-        tabControl.add(self.tab5, text="Rezepte")
+        tabControl.add(self.tab5, text="Rezepte      ")
         Addings.Rezepte(self)
 
         self.tab6 = ttk.Frame(tabControl)
-        tabControl.add(self.tab6, text="Essensplan")
+        tabControl.add(self.tab6, text="Essensplan ")
         Addings.Essensplan(self)
 
         tabControl.pack(expand=1, fill="both")
@@ -91,8 +91,8 @@ class Addings:
         """Tab3."""
 
         Label(
-            self.tab3, text="Termine", width=30, height=32, bd=5, relief="sunken"
-        ).grid(column=1, row=1)
+            self.tab3, text="Termine", width=50, height=32, bd=5, relief="sunken"
+        ).grid(column=0, row=0)
 
         events = {
             "2020-05-28": ("London", "meeting"),
@@ -105,8 +105,8 @@ class Addings:
             date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
             cal.calevent_create(date, events[k][0], events[k][1])
 
-        cal.tag_config("meeting", background="green", foreground="yellow")
-        cal.grid(column=2, row=1, sticky="wens")
+        cal.tag_config("meeting", background="red", foreground="yellow")
+        cal.grid(column=1, row=0, sticky="wens")
 
     def Einkaufen(self):
         """Tab4."""

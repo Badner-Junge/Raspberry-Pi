@@ -18,9 +18,13 @@ from tabs import *
 
 
 def Tabs(self):
-    """Tabs Position."""
+    """Config Tabs."""
+    tabConfiguration = ttk.Style()
+    tabConfiguration.configure(
+        "TNotebook", tabposition="w", tabmargins=0, padding=-5, background="grey"
+    )
     tabStyle = ttk.Style()
-    tabStyle.configure("TNotebook", tabposition="w")
+    tabStyle.configure("TNotebook.Tab", font="Comic 24", background="white")
 
 
 def Calendar(self):
