@@ -8,14 +8,10 @@ Geschrieben von: Fabian Rieger
 
 from tkinter import *
 from tkinter import ttk
-import tkinter.messagebox
-import tkinter as tk
-import tkcalendar
 from tkcalendar import Calendar, DateEntry
-import datetime
 from config import *
-
-# import config
+import config, datetime, tkcalendar, tkinter.messagebox
+import tkinter as tk
 
 
 class Register:
@@ -105,8 +101,12 @@ class Addings:
             date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
             cal.calevent_create(date, events[k][0], events[k][1])
 
-        cal.tag_config("meeting", background="red", foreground="yellow")
+        cal.tag_config(
+            "meeting", background=config.calendar[0], foreground=config.calendar[1]
+        )
         cal.grid(column=1, row=0, sticky="wens")
+
+        print("Kalender:", config.calendar)
 
     def Einkaufen(self):
         """Tab4."""
@@ -114,7 +114,27 @@ class Addings:
 
     def Rezepte(self):
         """Tab5."""
-        Label(self.tab5, text="Please Select your choice").place(x=250, y=100)
+        tree = ttk.Treeview(self.tab5, columns=("one", "two"))
+        # tree["columns"] = ("one", "two")
+        tree.column("one", width=config.tree[0][0])
+        tree.column("two", width=config.tree[1][0])
+        tree.heading("one", text=config.tree[0][1])
+        tree.heading("two", text=config.tree[1][1])
+
+        cat1 = tree.insert("", 1, "dir2", text=config.tree[-1][0])
+        tree.insert(
+            cat1, "end", "dir 2", text=config.tree[0][2], values=(config.tree[0][3])
+        )
+
+        cat2 = tree.insert("", 2, "dir3", text=config.tree[-1][1])
+        tree.insert(
+            cat2, "end", "dir 3", text=config.tree[1][2], values=(config.tree[1][3])
+        )
+
+        tree.pack(side="left", anchor="nw", fill="y")
+
+        view = tk.Label(self.tab5, text=config.recipe[0], bg=config.recipe[1])
+        view.pack(anchor="e", fill="both", expand=1)
 
     def Essensplan(self):
         """Tab6."""

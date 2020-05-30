@@ -8,12 +8,16 @@ Geschrieben von: Fabian Rieger
 
 from tkinter import *
 from tkinter import ttk
-import tkinter.messagebox
+from config import *
+import os, config, tkinter.messagebox
 import tkinter as tk
-import config
-import os
 
 
-class Screen:
-    def __init__(self):
-        pass
+def fullscreen_toggle(self):
+    """Fullscreen from menu.py."""
+    menu.options.fullscreen_toggle(self)
+
+
+def end(self):
+    """Close Main Window."""
+    root.destroy()

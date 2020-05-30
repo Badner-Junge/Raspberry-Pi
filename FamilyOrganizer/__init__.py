@@ -9,10 +9,12 @@ Geschrieben von: Fabian Rieger
 
 from tkinter import *
 from tkinter import ttk
-import tkinter.messagebox
+from menu import *
+from modules import *
+from tabs import *
+from config import *
+import menu, modules, tabs, config, os, tkinter.messagebox
 import tkinter as tk
-import os
-import menu, modules, tabs, config
 
 if os.environ.get("DISPLAY", "") == "":
     print("no display found. Using :0.0")
@@ -31,8 +33,8 @@ class Root(Tk):
         self.configure(background="white")
 
         menu.menuBar.createMenu(self)
-        config.Tabs(self)
         tabs.Register.cards(self)
+        config.Style()
 
     def fullscreen_toggle(self):
         """Fullscreen from menu.py."""
