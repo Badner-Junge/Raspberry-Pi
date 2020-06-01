@@ -11,9 +11,8 @@ from tkinter import *
 from tkinter import ttk
 from menu import *
 from modules import *
-from tabs import *
 from config import *
-import menu, modules, tabs, config, os, tkinter.messagebox
+import menu, modules, config, os, tkinter.messagebox
 import tkinter as tk
 
 if os.environ.get("DISPLAY", "") == "":
@@ -30,15 +29,15 @@ class Root(Tk):
         self.title("Family Organizer")
         self.attributes("-fullscreen", TRUE)
         self.minsize(512, 265)
-        self.configure(background="white")
+        # self.configure(background="white")
 
         menu.menuBar.createMenu(self)
-        tabs.Register.cards(self)
-        config.Style()
+        modules.Tabs.cards(self)
+        config.style()
 
     def fullscreen_toggle(self):
         """Fullscreen from menu.py."""
-        menu.options.fullscreen_toggle(self)
+        modules.fullscreen_toggle(self)
 
     def end(self):
         """Close Main Window."""

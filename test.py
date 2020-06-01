@@ -119,48 +119,82 @@ if os.environ.get("DISPLAY", "") == "":
 
 # root.mainloop()
 
-try:
-    # Python2
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    # Python3
-    import tkinter as tk
-    import tkinter.ttk as ttk
+# try:
+#     # Python2
+#     import Tkinter as tk
+#     import ttk
+# except ImportError:
+#     # Python3
+#     import tkinter as tk
+#     import tkinter.ttk as ttk
 
-root = tk.Tk()
-# use width x height + x_offset + y_offset (no spaces!)
-root.geometry("%dx%d+%d+%d" % (300, 200, 100, 50))
-root.title("testing the ttk.Notebook")
+# root = tk.Tk()
+# # use width x height + x_offset + y_offset (no spaces!)
+# root.geometry("%dx%d+%d+%d" % (300, 200, 100, 50))
+# root.title("testing the ttk.Notebook")
 
-nb = ttk.Notebook(root)
-nb.pack(fill="both", expand="yes")
+# nb = ttk.Notebook(root)
+# nb.pack(fill="both", expand="yes")
 
-# create a child frame for each page
-f1 = tk.Frame(bg="red")
-f2 = tk.Frame(bg="blue")
-f3 = tk.Frame(bg="green")
+# # create a child frame for each page
+# f1 = tk.Frame(bg="red")
+# f2 = tk.Frame(bg="blue")
+# f3 = tk.Frame(bg="green")
 
-# create the pages, text goes on the tabs
-nb.add(f1, text="page1")
-nb.add(f2, text="page2")
-nb.add(f3, text="page3")
+# # create the pages, text goes on the tabs
+# nb.add(f1, text="page1")
+# nb.add(f2, text="page2")
+# nb.add(f3, text="page3")
 
-# put a button widget on child frame f1 on page1
-button1 = tk.Button(f1, text="button1")
-button1.pack(side="left", anchor="nw", padx=3, pady=5)
+# # put a button widget on child frame f1 on page1
+# button1 = tk.Button(f1, text="button1")
+# button1.pack(side="left", anchor="nw", padx=3, pady=5)
 
-# put a combo box widget on child frame f2 on page2
-combo = ttk.Combobox(f2)
-shop_list = ["grapes", "pears", "onions"]
-combo["values"] = shop_list
-combo.set(shop_list[0])
-combo.pack(side="left", anchor="nw", padx=3, pady=5)
+# # put a combo box widget on child frame f2 on page2
+# combo = ttk.Combobox(f2)
+# shop_list = ["grapes", "pears", "onions"]
+# combo["values"] = shop_list
+# combo.set(shop_list[0])
+# combo.pack(side="left", anchor="nw", padx=3, pady=5)
 
-# put something different into frame f3 on page3
-listbox = tk.Listbox(f3, bg="yellow")
-for item in shop_list:
-    listbox.insert("end", item)
-listbox.pack(side="left", anchor="nw", padx=3, pady=5)
+# # put something different into frame f3 on page3
+# listbox = tk.Listbox(f3, bg="yellow")
+# for item in shop_list:
+#     listbox.insert("end", item)
+# listbox.pack(side="left", anchor="nw", padx=3, pady=5)
 
-root.mainloop()
+# root.mainloop()
+
+
+root = Tk()
+
+v = IntVar()
+v.set(1)  # initializing the choice, i.e. Python
+
+languages = [("Python", 1), ("Perl", 2), ("Java", 3), ("C++", 4), ("C", 5)]
+
+
+def ShowChoice():
+    print(v.get())
+
+
+Label(
+    root,
+    text="""Choose your favourite 
+programming language:""",
+    justify=LEFT,
+    padx=20,
+).pack()
+
+for txt, val in languages:
+    Radiobutton(
+        root,
+        text=txt,
+        indicatoron=0,
+        width=20,
+        padx=20,
+        variable=v,
+        command=ShowChoice,
+        value=val,
+    ).pack(anchor=W)
+mainloop()
