@@ -17,11 +17,20 @@ def style():
     """Config Style Tabs."""
     tabConfiguration = ttk.Style()
     tabConfiguration.configure(
-        "vertical.TNotebook",
+        "main.TNotebook",
         tabposition="w",
         tabmargins=0,
         padding=-5,
         background="lightgrey",
+    )
+    tabConfiguration.configure(
+        "kids.TNotebook",
+        tabposition="n",
+        tabmargins=0,
+        padding=-5,
+        background="lightgrey",
+        fill="both",
+        expand=True,
     )
     tabStyle = ttk.Style()
     tabStyle.configure("TNotebook.Tab", font="Comic 24", background="white")
@@ -34,6 +43,12 @@ def style():
 # Übersicht
 def overview():
     """Config Overview."""
+    pass
+
+
+# To-Do
+def todo():
+    """Config To-Do."""
     pass
 
 
@@ -50,19 +65,19 @@ def calendar():
     meetingFG = "red"
 
     """Config Calendar Buttons."""
-    cal_button1_text = "Termin anzeigen"
-    cal_button2_text = "Termin suchen"
-    cal_button3_text = "Termin ändern"
-    cal_button4_text = "neuer Termin"
-    cal_button5_text = "Termin löschen"
-    cal_button6_text = "Terminübersicht"
+    cal_button1_text = "Terminübersicht"
+    cal_button2_text = "Termin anzeigen"
+    cal_button3_text = "Termin suchen"
+    cal_button4_text = "Termin ändern"
+    cal_button5_text = "neuer Termin"
+    cal_button6_text = "Termin löschen"
 
-    cal_colorbutton1 = "lightgrey"
+    cal_colorbutton1 = "yellow"
     cal_colorbutton2 = "lightgrey"
     cal_colorbutton3 = "lightgrey"
-    cal_colorbutton4 = "lightgreen"
-    cal_colorbutton5 = "red"
-    cal_colorbutton6 = "yellow"
+    cal_colorbutton4 = "lightgrey"
+    cal_colorbutton5 = "lightgreen"
+    cal_colorbutton6 = "red"
 
     cal_button_text = [
         cal_button1_text,
@@ -154,12 +169,62 @@ def meal():
         ("Sonntag", 7),
     ]
 
-    return week_day
+    day = [
+        ("Montag"),
+        ("Dienstag"),
+        ("Mittwoch"),
+        ("Donnerstag"),
+        ("Freitag"),
+        ("Samstag"),
+        ("Sonntag"),
+    ]
+
+    """Config Meal Buttons."""
+    meal_button1_text = "Essen hinzufügen"
+    meal_button2_text = "Essen ändern"
+    meal_button3_text = "?"
+    meal_button4_text = "Essen löschen"
+    meal_button5_text = "Woche 1 löschen"
+    meal_button6_text = "Woche 2 löschen"
+
+    meal_colorbutton1 = "lightgrey"
+    meal_colorbutton2 = "lightgrey"
+    meal_colorbutton3 = "lightgrey"
+    meal_colorbutton4 = "red"
+    meal_colorbutton5 = "red"
+    meal_colorbutton6 = "red"
+
+    meal_button_text = [
+        meal_button1_text,
+        meal_button2_text,
+        meal_button3_text,
+        meal_button4_text,
+        meal_button5_text,
+        meal_button6_text,
+    ]
+    meal_button_color = [
+        meal_colorbutton1,
+        meal_colorbutton2,
+        meal_colorbutton3,
+        meal_colorbutton4,
+        meal_colorbutton5,
+        meal_colorbutton6,
+    ]
+
+    return week_day, day, meal_button_text, meal_button_color
+
+
+# Haushalt
+def home():
+    """Config Home."""
+    pass
 
 
 overview = overview()
+todo = todo()
 children = children()
 calendar = calendar()
 shopping = shopping()
 recipe = recipe()
 meal = meal()
+home = home()

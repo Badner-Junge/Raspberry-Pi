@@ -19,12 +19,16 @@ class Tabs:
 
     def cards(self):
         """Create Tabs."""
-        tabControl = ttk.Notebook(self, style="vertical.TNotebook")
+        tabControl = ttk.Notebook(self, style="main.TNotebook")
 
         self.tab1 = ttk.Frame(tabControl)
         tabControl.add(self.tab1, text="Übersicht    ")
         Tabs.uebersicht(self)
         # print(tabControl.index(tabControl.select()))
+
+        self.tab7 = ttk.Frame(tabControl)
+        tabControl.add(self.tab7, text="To-Do          ")
+        Tabs.to_do(self)
 
         self.tab2 = ttk.Frame(tabControl)
         tabControl.add(self.tab2, text="Kinder         ")
@@ -46,6 +50,10 @@ class Tabs:
         self.tab6 = ttk.Frame(tabControl)
         tabControl.add(self.tab6, text="Essensplan ")
         Tabs.essensplan(self)
+
+        self.tab8 = ttk.Frame(tabControl)
+        tabControl.add(self.tab8, text="Haushalt     ")
+        Tabs.haushalt(self)
 
         tabControl.pack(expand=1, fill="both")
 
@@ -73,12 +81,16 @@ class Tabs:
             fg="blue",
         ).grid(column=1, row=5)
 
+    def to_do(self):
+        """Tab7."""
+        Label(self.tab7, text="Please Select your choice").place(x=250, y=80)
+
     def kinder(self):
         """Tab2."""
         kids_frame = tk.Frame(self.tab2)
         kids_frame.pack(fill="both")
 
-        tabkids = ttk.Notebook(kids_frame)
+        tabkids = ttk.Notebook(kids_frame, style="kids.TNotebook")
 
         self.tabkids1 = ttk.Frame(tabkids)
         tabkids.add(self.tabkids1, text="Fabienne")
@@ -95,10 +107,6 @@ class Tabs:
         tabkids.pack(expand=1, fill="both")
 
         self.tab_kids = tabkids
-
-        Label(
-            self.tabkids1, text="Hallo", width=80, height=20, bd=5, relief="sunken"
-        ).grid(column=1, row=1)
 
     def kalender(self):
         """Tab3 Calendar."""
@@ -121,14 +129,6 @@ class Tabs:
         """Tab3 Buttons."""
         cal_frame_buttons = tk.Frame(self.tab3)
         cal_frame_buttons.pack(anchor="e", fill="y", expand=1)
-
-        cal_button6 = tk.Button(
-            cal_frame_buttons,
-            text=config.calendar[2][5],
-            bg=config.calendar[3][5],
-            command=lambda: cal_top_window(6),
-        )
-        cal_button6.pack(anchor="e", fill="both", expand=1)
 
         cal_button1 = tk.Button(
             cal_frame_buttons,
@@ -170,6 +170,14 @@ class Tabs:
         )
         cal_button5.pack(anchor="e", fill="both", expand=1)
 
+        cal_button6 = tk.Button(
+            cal_frame_buttons,
+            text=config.calendar[2][5],
+            bg=config.calendar[3][5],
+            command=lambda: cal_top_window(6),
+        )
+        cal_button6.pack(anchor="e", fill="both", expand=1)
+
         print("Kalender:", config.calendar)
 
     def einkaufen(self):
@@ -208,7 +216,7 @@ class Tabs:
             text=config.recipe[3][0],
             command=lambda: rec_top_window(1),
         )
-        rec_button1.pack(anchor="e", fill="y", expand=1)
+        rec_button1.pack(anchor="e", fill="both", expand=1)
 
         # zum Essensolan
         rec_button2 = tk.Button(
@@ -217,7 +225,7 @@ class Tabs:
             text=config.recipe[3][1],
             command=lambda: rec_top_window(2),
         )
-        rec_button2.pack(anchor="e", fill="y", expand=1)
+        rec_button2.pack(anchor="e", fill="both", expand=1)
 
         # neue Kategorie
         rec_button3 = tk.Button(
@@ -256,8 +264,109 @@ class Tabs:
         rec_button6.pack(anchor="e", fill="both", expand=1)
 
     def essensplan(self):
-        """Tab6."""
-        Label(self.tab6, text="Please Select your choice").place(x=250, y=120)
+        """Tab6 Days."""
+        day_frame = tk.Frame(self.tab6)
+        day_frame.pack(side="left", fill="both", expand=True)
+        Label1 = Label(
+            day_frame, text="Wochentag", bd=5, relief="sunken", font="Times 24 bold"
+        ).pack()
+
+        for txt in config.meal[1]:
+            Label(day_frame, text=txt, font="Times 24").pack(fill="y", expand=True)
+
+        """Tab6 Frame this week."""
+        this_week_frame = tk.Frame(self.tab6)
+        this_week_frame.pack(side="left", fill="both", expand=True)
+        Label2 = Label(
+            this_week_frame,
+            text="aktuelle Woche",
+            bd=5,
+            relief="sunken",
+            font="Times 24 bold",
+        ).pack()
+
+        for txt in config.meal[1]:
+            Entry(this_week_frame, text=txt, font="Times 18").pack(
+                fill="y", expand=True
+            )
+
+        """Tab6 Frame next week."""
+        next_week_frame = tk.Frame(self.tab6)
+        next_week_frame.pack(side="left", fill="both", expand=True)
+        Label3 = Label(
+            next_week_frame,
+            text="nächste Woche",
+            bd=5,
+            relief="sunken",
+            font="Times 24 bold",
+        ).pack()
+
+        for txt in config.meal[1]:
+            Entry(next_week_frame, text=txt, font="Times 18").pack(
+                fill="y", expand=True
+            )
+
+        """Tab6 Buttons."""
+        meal_frame_buttons = tk.Frame(self.tab6)
+        meal_frame_buttons.pack(anchor="e", fill="y", expand=1)
+
+        # Rezept anzeigen
+        meal_button1 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][0],
+            text=config.meal[2][0],
+            command=lambda: meal_top_window(1),
+        )
+        meal_button1.pack(anchor="e", fill="both", expand=1)
+
+        # zum Essensolan
+        meal_button2 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][1],
+            text=config.meal[2][1],
+            command=lambda: meal_top_window(2),
+        )
+        meal_button2.pack(anchor="e", fill="both", expand=1)
+
+        # neue Kategorie
+        meal_button3 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][2],
+            text=config.meal[2][2],
+            command=lambda: meal_top_window(3),
+        )
+        meal_button3.pack(anchor="e", fill="both", expand=1)
+
+        # neues Rezept
+        meal_button4 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][3],
+            text=config.meal[2][3],
+            command=lambda: meal_top_window(4),
+        )
+        meal_button4.pack(anchor="e", fill="both", expand=1)
+
+        # Rezept bearbeiten
+        meal_button5 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][4],
+            text=config.meal[2][4],
+            command=lambda: meal_top_window(5),
+        )
+        meal_button5.pack(anchor="e", fill="both", expand=1)
+
+        # Rezept löschen
+        meal_button6 = tk.Button(
+            meal_frame_buttons,
+            bg=config.meal[3][5],
+            text=config.meal[2][5],
+            command=lambda: meal_top_window(6),
+        )
+        meal_button6.pack(anchor="e", fill="both", expand=1)
+
+    def haushalt(self):
+        """Tab8."""
+        Label(self.tab8, text="Please Select your choice").place(x=250, y=80)
 
 
 def cal_top_window(args):
@@ -338,21 +447,9 @@ def cal_top_window(args):
         ).grid(column=2, row=4)
         print(config.calendar[2][3])
     elif args == 5:
-        """Rezept löschen."""
-        recipe_del = tk.messagebox.askquestion(
-            config.calendar[2][4],
-            "Möchtest du den Termin wirklich löschen?",
-            icon="warning",
-        )
-        if recipe_del == "yes":
-            print("Termin gelöscht")
-        else:
-            print("Termin nicht gelöscht")
-        print(config.calendar[2][4])
-    elif args == 6:
         """Rezept ändern."""
         recipe_edit = Toplevel()
-        recipe_edit.title(config.calendar[2][5])
+        recipe_edit.title(config.calendar[2][4])
         recipe_edit.geometry("+%d+%d" % (400, 200))
         rec_edit_label1 = tk.Label(recipe_edit, text="Rezept:").grid(column=1, row=1)
         rec_edit_label2 = tk.Label(recipe_edit, text="Zutaten:").grid(column=1, row=2)
@@ -366,10 +463,21 @@ def cal_top_window(args):
         rec_edit_button2 = tk.Button(
             recipe_edit, text="Abbrechen", command=recipe_edit.destroy
         ).grid(column=2, row=4)
+        print(config.calendar[2][4])
+    elif args == 6:
+        """Rezept löschen."""
+        recipe_del = tk.messagebox.askquestion(
+            config.calendar[2][5],
+            "Möchtest du den Termin wirklich löschen?",
+            icon="warning",
+        )
+        if recipe_del == "yes":
+            print("Termin gelöscht")
+        else:
+            print("Termin nicht gelöscht")
         print(config.calendar[2][5])
 
 
-# Rezepte Buttons
 def rec_top_window(args):
     """Create Toplevel Windows Rezepte."""
     if args == 1:
@@ -401,7 +509,7 @@ def rec_top_window(args):
 
         Label(recipe_add, text="Wähle einen Wochentag:", justify=LEFT, padx=20,).pack()
 
-        for txt, val in config.meal:
+        for txt, val in config.meal[0]:
             Radiobutton(
                 recipe_add,
                 text=txt,
@@ -477,6 +585,97 @@ def rec_top_window(args):
         else:
             print("Rezept nicht gelöscht")
         print(config.recipe[3][5])
+
+
+def meal_top_window(args):
+    """Create Toplevel Windows Rezepte."""
+    if args == 1:
+        """Essen hinzufügen."""
+        meal_add = Toplevel()
+        meal_add.title(config.meal[2][0])
+        meal_add.geometry("+%d+%d" % (400, 200))
+        meal_add_label1 = tk.Label(meal_add, text="Rezept:").grid(column=1, row=1)
+        meal_add_label2 = tk.Label(meal_add, text="Zutaten:").grid(column=1, row=2)
+        meal_add_label3 = tk.Label(meal_add, text="Anleitung:").grid(column=1, row=3)
+
+        meal_add_entry1 = tk.Entry(meal_add).grid(column=2, row=1)
+        meal_add_entry2 = tk.Entry(meal_add).grid(column=2, row=2)
+        meal_add_entry3 = tk.Entry(meal_add).grid(column=2, row=3)
+
+        meal_add_button1 = tk.Button(meal_add, text="OK").grid(column=1, row=4)
+        meal_add_button2 = tk.Button(
+            meal_add, text="Abbrechen", command=meal_add.destroy
+        ).grid(column=2, row=4)
+        print(config.meal[2][0])
+    elif args == 2:
+        """Essen ändern."""
+        meal_edit = Toplevel()
+        meal_edit.title(config.meal[2][1])
+        meal_edit.geometry("+%d+%d" % (400, 200))
+
+        v = IntVar()
+        v.set(1)
+
+        Label(meal_edit, text="Wähle einen Wochentag:", justify=LEFT, padx=20,).pack()
+
+        for txt, val in config.meal[0]:
+            Radiobutton(
+                meal_edit,
+                text=txt,
+                indicatoron=0,
+                width=20,
+                padx=20,
+                variable=v,
+                command=meal_edit.destroy,
+                value=val,
+            ).pack(anchor=W)
+        print(config.meal[2][1])
+    elif args == 3:
+        """?."""
+        meal_del = Toplevel()
+        meal_del.title(config.meal[2][2])
+        meal_del.geometry("+%d+%d" % (400, 200))
+        meal_del_label = tk.Label(meal_del, text="Neue Kategorie:").grid(
+            column=1, row=1
+        )
+        meal_del_entry = tk.Entry(meal_del).grid(column=2, row=1)
+        meal_del_button1 = tk.Button(meal_del, text="OK").grid(column=1, row=2)
+        meal_del_button2 = tk.Button(
+            meal_del, text="Abbrechen", command=meal_del.destroy
+        ).grid(column=2, row=2)
+        print(config.meal[2][2])
+    elif args == 4:
+        """Einzelnen Tag löschen."""
+        day_del = tk.messagebox.askquestion(
+            config.meal[2][3],
+            "Möchtest du einen Tag wirklich löschen?",
+            icon="warning",
+        )
+        if day_del == "yes":
+            print("Ein Tag gelöscht")
+        else:
+            print("Ein Tag nicht gelöscht")
+        print(config.meal[2][3])
+    elif args == 5:
+        """Woche 1 löschen."""
+        week1_del = tk.messagebox.askquestion(
+            config.meal[2][4], "Möchtest du Woche 1 wirklich löschen?", icon="warning",
+        )
+        if week1_del == "yes":
+            print("Woche 1 gelöscht")
+        else:
+            print("Woche 1 nicht gelöscht")
+        print(config.meal[2][4])
+    elif args == 6:
+        """Woche 2 löschen."""
+        week2_del = tk.messagebox.askquestion(
+            config.meal[2][5], "Möchtest du Woche 2 wirklich löschen?", icon="warning",
+        )
+        if week2_del == "yes":
+            print("Woche 2 gelöscht")
+        else:
+            print("Woche 2 nicht gelöscht")
+        print(config.meal[2][5])
 
 
 # Optionen Menü
