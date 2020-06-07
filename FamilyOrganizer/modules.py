@@ -671,7 +671,7 @@ def top_window(args):
                 cal_view, text="Wähle einen Wochentag:", justify=LEFT, padx=20,
             ).pack()
 
-            for txt, val in config.meal:
+            for txt, val in config.meal[0][0]:
                 Radiobutton(
                     cal_view,
                     text=txt,
@@ -921,14 +921,17 @@ def top_window(args):
             recipe_add.title(config.sidebar_buttons[6][1][0])
             recipe_add.geometry("+%d+%d" % (400, 200))
 
+            recipe_thisweek = Radiobutton(
+                recipe_add, text="Aktuelle Woche", indicatoron=0
+            ).grid(column=1, row=1)
+            recipe_nextweek = Radiobutton(
+                recipe_add, text="Nächste Woche", indicatoron=0, value=0
+            ).grid(column=2, row=1)
+
             v = IntVar()
             v.set(1)
 
-            Label(
-                recipe_add, text="Wähle einen Wochentag:", justify=LEFT, padx=20,
-            ).pack()
-
-            for txt, val in config.meal[0]:
+            for txt, val in config.meal[0][0]:
                 Radiobutton(
                     recipe_add,
                     text=txt,
@@ -938,7 +941,8 @@ def top_window(args):
                     variable=v,
                     command=recipe_add.destroy,
                     value=val,
-                ).pack(anchor=W)
+                ).grid(column=1, columnspan=2)
+
         elif args == 33:
             """neue Kategorie."""
             categorie_new = Toplevel()

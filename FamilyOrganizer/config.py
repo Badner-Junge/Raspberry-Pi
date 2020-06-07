@@ -9,8 +9,38 @@ Geschrieben von: Fabian Rieger
 from tkinter import *
 from tkinter import ttk
 from modules import *
-import modules, tkinter.messagebox
+import modules, tkinter.messagebox, os, sqlite3
 import tkinter as tk
+
+
+def new_file():
+    if not os.path.exists("family_data.db"):
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        sql = "CREATE TABLE daten(id INTEGER PRIMARY KEY, deu TEXT, eng TEXT, fra TEXT)"
+        cursor.execute(sql)
+        startdaten = [
+            ["suchen", "to look for", "chercher"],
+            ["abkürzen", "to abbreviate", "raccourcir"],
+            ["nützlich", "useful", "utile"],
+            ["beraten", "to advise", "conseiller"],
+            ["einfach", "easy", "simple"],
+            ["ankündigen", "to announce", "annoncer"],
+        ]
+        for gruppe in startdaten:
+            sql = (
+                "INSERT INTO daten(deu, eng, fra) VALUES('"
+                + gruppe[0]
+                + "', '"
+                + gruppe[1]
+                + "', '"
+                + gruppe[2]
+                + "')"
+            )
+            print(sql)
+            cursor.execute(sql)
+            con.commit()
+        con.close()
 
 
 def style():
