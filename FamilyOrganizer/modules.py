@@ -243,37 +243,37 @@ class Tabs:
                 command=val,
             ).pack(fill="y", expand=1)
 
-        # """Tab5 open Database"""
-        # con = sqlite3.connect("family_data.db")
-        # cursor = con.cursor()
-        # sql = "SELECT *"
-        # cursor.execute(sql)
-        # lxAlle.delete(0, "end")
-        # for dsatz in cursor:
-        #     lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
-        # con.close()
+        """Tab5 open Database"""
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        sql = "SELECT * FROM daten"
+        cursor.execute(sql)
+        lxAlle.delete(0, "end")
+        for dsatz in cursor:
+            lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
+        con.close()
 
-        # main = Toplevel()
-        # main["height"] = 480
-        # main["width"] = 600
+        main = Toplevel()
+        main["height"] = 480
+        main["width"] = 600
 
-        # lbListe = tkinter.Label(main, text="Alle Vokabeln:")
-        # lbListe.place(x=10, y=260)
-        # frListe = tkinter.Frame(main)
-        # frListe.place(x=10, y=290)
+        lbListe = tkinter.Label(main, text="Alle Vokabeln:")
+        lbListe.place(x=10, y=260)
+        frListe = tkinter.Frame(main)
+        frListe.place(x=10, y=290)
 
-        # scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
-        # lxAlle = tkinter.Listbox(
-        #     frListe, width=40, height=7, yscrollcommand=scbAlle.set
-        # )
-        # scbAlle["command"] = lxAlle.yview
-        # lxAlle.pack(side="left")
-        # scbAlle.pack(side="left", fill="y")
+        scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
+        lxAlle = tkinter.Listbox(
+            frListe, width=40, height=7, yscrollcommand=scbAlle.set
+        )
+        scbAlle["command"] = lxAlle.yview
+        lxAlle.pack(side="left")
+        scbAlle.pack(side="left", fill="y")
 
-        # buAlleAnzeigen = tkinter.Button(
-        #     main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
-        # )
-        # buAlleAnzeigen.place(x=380, y=290)
+        buAlleAnzeigen = tkinter.Button(
+            main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
+        )
+        buAlleAnzeigen.place(x=380, y=290)
 
         """Tab5 Treeview."""
         tree = ttk.Treeview(self.tab6, columns=(config.recipe[0]))
