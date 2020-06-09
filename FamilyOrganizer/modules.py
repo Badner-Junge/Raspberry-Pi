@@ -244,40 +244,13 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 open Database"""
-        # main = Toplevel()
-        # main["height"] = 480
-        # main["width"] = 600
-
-        # con = sqlite3.connect("family_data.db")
-        # cursor = con.cursor()
-        # sql = "SELECT * FROM recipes_tree_config"
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        sql_conf = "SELECT * FROM rec_conf"
         # cursor.execute(sql)
-        # lxAlle.delete(0, "end")
-        # for dsatz in cursor:
-        #     lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
-        # con.close()
-
-        # main = Toplevel()
-        # main["height"] = 480
-        # main["width"] = 600
-
-        # lbListe = tkinter.Label(main, text="Alle Vokabeln:")
-        # lbListe.place(x=10, y=260)
-        # frListe = tkinter.Frame(main)
-        # frListe.place(x=10, y=290)
-
-        # scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
-        # lxAlle = tkinter.Listbox(
-        #     frListe, width=40, height=7, yscrollcommand=scbAlle.set
-        # )
-        # scbAlle["command"] = lxAlle.yview
-        # lxAlle.pack(side="left")
-        # scbAlle.pack(side="left", fill="y")
-
-        # buAlleAnzeigen = tkinter.Button(
-        #     main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
-        # )
-        # buAlleAnzeigen.place(x=380, y=290)
+        # lxName.delete(0, "end")
+        for dsatz in cursor:
+            lxName.insert("end", dsatz[0])
 
         """Tab5 Treeview."""
         tree = ttk.Treeview(self.tab6, columns=(config.recipe[0]))
@@ -285,7 +258,9 @@ class Tabs:
         recipe = 0
         column = 0
         while column < len(config.recipe[0]):
-            tree.column(config.recipe[0][column], width=config.recipe[2][0])
+            cursor.execute(sql_conf)
+            column = cursor.fetchall()
+            tree.column(row[1], width=config.recipe[2][0])
             tree.heading(config.recipe[0][column], text=config.recipe[1][column])
             column += 1
         while recipe < len(config.recipe[-1]):
@@ -308,6 +283,7 @@ class Tabs:
             recipe += 1
 
         tree.pack(side="right", anchor="nw", fill="both", expand=True)
+        con.close()
 
     def meals(self):
         """Tab6 Meal Sidebar."""
@@ -954,37 +930,82 @@ def top_window(args):
             """Rezept anzeigen."""
             recipe_view = Toplevel()
             recipe_view.title(config.sidebar_buttons[6][0][0])
-            recipe_view.geometry("+%d+%d" % (200, 100))
+            recipe_view.geometry("+%d+%d" % (250, 50))
             recipe_view["height"] = 480
             recipe_view["width"] = 600
 
-            def alleAnzeigen():
+            def name():
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
-                sql = "SELECT * FROM recipes_tree_config"
+                sql = "SELECT rec_cat FROM recipes_tree_config"
                 cursor.execute(sql)
-                lxAlle.delete(0, "end")
+                lxName.delete(0, "end")
                 for dsatz in cursor:
-                    lxAlle.insert("end", dsatz[1])
+                    lxName.insert("end", dsatz[0])
                 con.close()
 
-            lbListe = tkinter.Label(recipe_view, text="Zutaten:")
-            lbListe.place(x=10, y=260)
-            frListe = tkinter.Frame(recipe_view)
-            frListe.place(x=10, y=290)
+            def ingredient():
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                sql = "SELECT rec_ingredient FROM recipes_tree_config"
+                cursor.execute(sql)
+                lxIngredient.delete(0, "end")
+                for dsatz in cursor:
+                    lxIngredient.insert("end", dsatz[0])
+                con.close()
 
-            scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
-            lxAlle = tkinter.Listbox(
-                frListe, width=40, height=7, yscrollcommand=scbAlle.set
-            )
-            scbAlle["command"] = lxAlle.yview
-            lxAlle.pack(side="left")
-            scbAlle.pack(side="left", fill="y")
+            def recipe():
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                sql = "SELECT rec_column_heading FROM recipes_tree_config"
+                cursor.execute(sql)
+                lxRecipe.delete(0, "end")
+                for dsatz in cursor:
+                    lxRecipe.insert("end", dsatz[0])
+                con.close()
 
-            buAlleAnzeigen = tkinter.Button(
-                recipe_view, text="Zutaten anzeigen", command=alleAnzeigen
+            lbName = tkinter.Label(recipe_view, text="Rezept:")
+            lbName.place(x=10, y=10)
+            lxName = tkinter.Listbox(recipe_view, width=55, height=2)
+            lxName.place(x=90, y=10)
+
+            lbIngredient = tkinter.Label(recipe_view, text="Zutaten:")
+            lbIngredient.place(x=10, y=40)
+            frIngredient = tkinter.Frame(recipe_view)
+            frIngredient.place(x=90, y=40)
+
+            scbIngredient = tkinter.Scrollbar(frIngredient, orient="vertical")
+            lxIngredient = tkinter.Listbox(
+                frIngredient, width=55, height=8, yscrollcommand=scbIngredient.set
             )
-            buAlleAnzeigen.place(x=380, y=290)
+            scbIngredient["command"] = lxIngredient.yview
+            lxIngredient.pack(side="left")
+            scbIngredient.pack(side="left", fill="y")
+
+            lbRecipe = tkinter.Label(recipe_view, text="Anleitung:")
+            lbRecipe.place(x=10, y=200)
+            frRecipe = tkinter.Frame(recipe_view)
+            frRecipe.place(x=90, y=200)
+
+            scbRecipe = tkinter.Scrollbar(frRecipe, orient="vertical")
+            lxRecipe = tkinter.Listbox(
+                frRecipe, width=55, height=12, yscrollcommand=scbRecipe.set
+            )
+            scbRecipe["command"] = lxRecipe.yview
+            lxRecipe.pack(side="left")
+            scbRecipe.pack(side="left", fill="y")
+
+            buShow = tkinter.Button(
+                recipe_view,
+                text="Anzeigen",
+                command=lambda: [name(), ingredient(), recipe()],
+            )
+            buShow.place(x=220, y=435)
+
+            buClose = tkinter.Button(
+                recipe_view, text="Schließen", command=recipe_view.destroy
+            )
+            buClose.place(x=420, y=435)
         elif args == 32:
             """zu Essensplan."""
             recipe_add = Toplevel()
