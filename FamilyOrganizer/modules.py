@@ -10,8 +10,9 @@ from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from config import *
-import config, datetime, tkcalendar, tkinter.messagebox, time
+import config, datetime, tkcalendar, tkinter.messagebox, time, sys, threading
 import tkinter as tk
+import RPi.GPIO as GPIO
 
 # Tabs und Inhalt erzeugen und verwalten
 class Tabs:
@@ -243,22 +244,32 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab6 Treeview."""
-        tree = ttk.Treeview(self.tab6, columns=("one", "two"))
+        tree = ttk.Treeview(self.tab6, columns=(config.recipe[0]))
         # tree["columns"] = ("one", "two")
-        tree.column("one", width=config.recipe[0][0])
-        tree.column("two", width=config.recipe[1][0])
-        tree.heading("one", text=config.recipe[0][1])
-        tree.heading("two", text=config.recipe[1][1])
-
-        cat1 = tree.insert("", 1, "dir2", text=config.recipe[2][0])
-        tree.insert(
-            cat1, "end", "dir 2", text=config.recipe[0][2], values=(config.recipe[0][3])
-        )
-
-        cat2 = tree.insert("", 2, "dir3", text=config.recipe[2][1])
-        tree.insert(
-            cat2, "end", "dir 3", text=config.recipe[1][2], values=(config.recipe[1][3])
-        )
+        recipe = 0
+        column = 0
+        while column < len(config.recipe[0]):
+            tree.column(config.recipe[0][column], width=config.recipe[2][0])
+            tree.heading(config.recipe[0][column], text=config.recipe[1][column])
+            column += 1
+        while recipe < len(config.recipe[-1]):
+            cat = tree.insert(
+                "",
+                config.recipe[3][recipe],
+                config.recipe[4][recipe],
+                text=config.recipe[-1][recipe],
+            )
+            cat_sub1 = tree.insert(
+                cat,
+                "end",
+                config.recipe[5][recipe],
+                text=config.recipe[7][recipe],
+                values=10,
+            )
+            cat_sub2 = tree.insert(
+                cat_sub1, "end", config.recipe[6][recipe], text=config.recipe[8],
+            )
+            recipe += 1
 
         tree.pack(side="right", anchor="nw", fill="both", expand=True)
 
@@ -356,16 +367,27 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         budget_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
-        budget_frame.pack(side="top", anchor="w")
+        budget_frame.pack(side="top", fill="y")
 
-        budget_in_label = tk.Label(budget_frame, text="Einnahmen: ").pack(side="top")
-        # budget_in_last = tk.Label(budget_frame, text="20,00€ (letzte: 10,00€)").pack(
-        #     side="left", anchor="n"
-        # )
-        budget_out_label = tk.Label(budget_frame, text="Ausgaben: ").pack(side="top")
-        # budget_out_last = tk.Label(budget_frame, text="10,00€ (letzte: 5,00€)").pack(
-        #     side="left", anchor="n"
-        # )
+        budget_in_label = tk.Label(budget_frame, text="Einnahmen: ").grid(
+            column=1, row=1
+        )
+        budget_in_last = tk.Label(budget_frame, text="20,00€ (letzte: 10,00€)").grid(
+            column=2, row=1
+        )
+
+        budget_out_label = tk.Label(budget_frame, text="Ausgaben: ").grid(
+            column=1, row=2
+        )
+        budget_out_last = tk.Label(budget_frame, text="10,00€ (letzte: 5,00€)").grid(
+            column=2, row=2
+        )
+
+        wood_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
+        wood_frame.pack(side="left", fill="y")
+
+        wood_counter = tk.Label(wood_frame, text="Holz").grid(column=1, row=1)
+        wood_label = tk.Label(wood_frame, text="noch da").grid(column=2, row=2)
 
 
 def top_window(args):
@@ -942,7 +964,6 @@ def top_window(args):
                     command=recipe_add.destroy,
                     value=val,
                 ).grid(column=1, columnspan=2)
-
         elif args == 33:
             """neue Kategorie."""
             categorie_new = Toplevel()
@@ -1193,6 +1214,18 @@ def top_window(args):
                 print("Woche 2 gelöscht")
             else:
                 print("Woche 2 nicht gelöscht")
+
+
+def top_config(self):
+    """?."""
+    config_window = Toplevel()
+    config_window.title("Konfiguration")
+    config_window.geometry("+%d+%d" % (400, 200))
+
+    config_window_button1 = tk.Button(config_window, text="OK").grid(column=1, row=1)
+    config_window_button2 = tk.Button(
+        config_window, text="Abbrechen", command=config_window.destroy
+    ).grid(column=2, row=1)
 
 
 def fullscreen_toggle(self):

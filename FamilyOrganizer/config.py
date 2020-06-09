@@ -13,36 +13,6 @@ import modules, tkinter.messagebox, os, sqlite3
 import tkinter as tk
 
 
-def new_file():
-    if not os.path.exists("family_data.db"):
-        con = sqlite3.connect("family_data.db")
-        cursor = con.cursor()
-        sql = "CREATE TABLE daten(id INTEGER PRIMARY KEY, deu TEXT, eng TEXT, fra TEXT)"
-        cursor.execute(sql)
-        startdaten = [
-            ["suchen", "to look for", "chercher"],
-            ["abkürzen", "to abbreviate", "raccourcir"],
-            ["nützlich", "useful", "utile"],
-            ["beraten", "to advise", "conseiller"],
-            ["einfach", "easy", "simple"],
-            ["ankündigen", "to announce", "annoncer"],
-        ]
-        for gruppe in startdaten:
-            sql = (
-                "INSERT INTO daten(deu, eng, fra) VALUES('"
-                + gruppe[0]
-                + "', '"
-                + gruppe[1]
-                + "', '"
-                + gruppe[2]
-                + "')"
-            )
-            print(sql)
-            cursor.execute(sql)
-            con.commit()
-        con.close()
-
-
 def style():
     """Config Style Tabs."""
     tabConfiguration = ttk.Style()
@@ -212,20 +182,28 @@ def shop():
 
 def recipe():
     """Config Recipe Treeview."""
-    rec_one_width = 70
-    rec_one_name = "Zeit"
-    rec_one_sub = "Nudelsuppe"
-    rec_one_values = "10", "Brühe"
-    rec_two_width = 70
-    rec_two_name = "Zutaten"
-    rec_two_sub = "Nudeln mit Ei"
-    rec_two_values = "5", "Ei"
+    rec_columns = ["1", "2"]
+    rec_heading = ["Zutaten", "Menge"]
+    rec_column_width = [70]
+    rec_categorie = [1, 2]
+    rec_categorie_dir = ["dir2", "dir3"]
+    rec_categorie_sub1 = ["dir 2", "dir 3"]
+    rec_categorie_sub2 = ["dir  2", "dir3  "]
+    rec_ingredient = ["AAA", "BBB"]
 
-    rec_one = [rec_one_width, rec_one_name, rec_one_sub, rec_one_values]
-    rec_two = [rec_two_width, rec_two_name, rec_two_sub, rec_two_values]
-    rec_categorie = ["Suppe", "Nudel"]
+    rec_cat = ["Suppe", "Nudel"]
 
-    return rec_one, rec_two, rec_categorie
+    return (
+        rec_columns,
+        rec_heading,
+        rec_column_width,
+        rec_categorie,
+        rec_categorie_dir,
+        rec_categorie_sub1,
+        rec_categorie_sub2,
+        rec_ingredient,
+        rec_cat,
+    )
 
 
 def meal():
