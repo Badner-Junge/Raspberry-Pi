@@ -29,7 +29,6 @@ class Root(Tk):
         self.title("Family Organizer")
         self.attributes("-fullscreen", TRUE)
         self.minsize(512, 265)
-        # self.configure(background="white")
 
         menu.menuBar.createMenu(self)
         modules.Tabs.cards(self)

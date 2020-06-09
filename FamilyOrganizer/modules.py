@@ -244,36 +244,40 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 open Database"""
-        con = sqlite3.connect("family_data.db")
-        cursor = con.cursor()
-        sql = "SELECT * FROM daten"
-        cursor.execute(sql)
-        lxAlle.delete(0, "end")
-        for dsatz in cursor:
-            lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
-        con.close()
+        # main = Toplevel()
+        # main["height"] = 480
+        # main["width"] = 600
 
-        main = Toplevel()
-        main["height"] = 480
-        main["width"] = 600
+        # con = sqlite3.connect("family_data.db")
+        # cursor = con.cursor()
+        # sql = "SELECT * FROM recipes_tree_config"
+        # cursor.execute(sql)
+        # lxAlle.delete(0, "end")
+        # for dsatz in cursor:
+        #     lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
+        # con.close()
 
-        lbListe = tkinter.Label(main, text="Alle Vokabeln:")
-        lbListe.place(x=10, y=260)
-        frListe = tkinter.Frame(main)
-        frListe.place(x=10, y=290)
+        # main = Toplevel()
+        # main["height"] = 480
+        # main["width"] = 600
 
-        scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
-        lxAlle = tkinter.Listbox(
-            frListe, width=40, height=7, yscrollcommand=scbAlle.set
-        )
-        scbAlle["command"] = lxAlle.yview
-        lxAlle.pack(side="left")
-        scbAlle.pack(side="left", fill="y")
+        # lbListe = tkinter.Label(main, text="Alle Vokabeln:")
+        # lbListe.place(x=10, y=260)
+        # frListe = tkinter.Frame(main)
+        # frListe.place(x=10, y=290)
 
-        buAlleAnzeigen = tkinter.Button(
-            main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
-        )
-        buAlleAnzeigen.place(x=380, y=290)
+        # scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
+        # lxAlle = tkinter.Listbox(
+        #     frListe, width=40, height=7, yscrollcommand=scbAlle.set
+        # )
+        # scbAlle["command"] = lxAlle.yview
+        # lxAlle.pack(side="left")
+        # scbAlle.pack(side="left", fill="y")
+
+        # buAlleAnzeigen = tkinter.Button(
+        #     main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
+        # )
+        # buAlleAnzeigen.place(x=380, y=290)
 
         """Tab5 Treeview."""
         tree = ttk.Treeview(self.tab6, columns=(config.recipe[0]))
@@ -950,25 +954,37 @@ def top_window(args):
             """Rezept anzeigen."""
             recipe_view = Toplevel()
             recipe_view.title(config.sidebar_buttons[6][0][0])
-            recipe_view.geometry("+%d+%d" % (400, 200))
-            rec_view_label1 = tk.Label(recipe_view, text="Rezept:").grid(
-                column=1, row=1
-            )
-            rec_view_label2 = tk.Label(recipe_view, text="Zutaten:").grid(
-                column=1, row=2
-            )
-            rec_view_label3 = tk.Label(recipe_view, text="Anleitung:").grid(
-                column=1, row=3
-            )
+            recipe_view.geometry("+%d+%d" % (200, 100))
+            recipe_view["height"] = 480
+            recipe_view["width"] = 600
 
-            rec_view_entry1 = tk.Entry(recipe_view).grid(column=2, row=1)
-            rec_view_entry2 = tk.Entry(recipe_view).grid(column=2, row=2)
-            rec_view_entry3 = tk.Entry(recipe_view).grid(column=2, row=3)
+            def alleAnzeigen():
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                sql = "SELECT * FROM recipes_tree_config"
+                cursor.execute(sql)
+                lxAlle.delete(0, "end")
+                for dsatz in cursor:
+                    lxAlle.insert("end", dsatz[1])
+                con.close()
 
-            rec_view_button1 = tk.Button(recipe_view, text="OK").grid(column=1, row=4)
-            rec_view_button2 = tk.Button(
-                recipe_view, text="Abbrechen", command=recipe_view.destroy
-            ).grid(column=2, row=4)
+            lbListe = tkinter.Label(recipe_view, text="Zutaten:")
+            lbListe.place(x=10, y=260)
+            frListe = tkinter.Frame(recipe_view)
+            frListe.place(x=10, y=290)
+
+            scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
+            lxAlle = tkinter.Listbox(
+                frListe, width=40, height=7, yscrollcommand=scbAlle.set
+            )
+            scbAlle["command"] = lxAlle.yview
+            lxAlle.pack(side="left")
+            scbAlle.pack(side="left", fill="y")
+
+            buAlleAnzeigen = tkinter.Button(
+                recipe_view, text="Zutaten anzeigen", command=alleAnzeigen
+            )
+            buAlleAnzeigen.place(x=380, y=290)
         elif args == 32:
             """zu Essensplan."""
             recipe_add = Toplevel()
