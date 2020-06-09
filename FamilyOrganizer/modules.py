@@ -244,13 +244,40 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 open Database"""
-        con = sqlite3.connect("family_data.db")
-        cursor = con.cursor()
-        sql_conf = "SELECT * FROM rec_conf"
+        # main = Toplevel()
+        # main["height"] = 480
+        # main["width"] = 600
+
+        # con = sqlite3.connect("family_data.db")
+        # cursor = con.cursor()
+        # sql = "SELECT * FROM recipes_tree_config"
         # cursor.execute(sql)
-        # lxName.delete(0, "end")
-        for dsatz in cursor:
-            lxName.insert("end", dsatz[0])
+        # lxAlle.delete(0, "end")
+        # for dsatz in cursor:
+        #     lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
+        # con.close()
+
+        # main = Toplevel()
+        # main["height"] = 480
+        # main["width"] = 600
+
+        # lbListe = tkinter.Label(main, text="Alle Vokabeln:")
+        # lbListe.place(x=10, y=260)
+        # frListe = tkinter.Frame(main)
+        # frListe.place(x=10, y=290)
+
+        # scbAlle = tkinter.Scrollbar(frListe, orient="vertical")
+        # lxAlle = tkinter.Listbox(
+        #     frListe, width=40, height=7, yscrollcommand=scbAlle.set
+        # )
+        # scbAlle["command"] = lxAlle.yview
+        # lxAlle.pack(side="left")
+        # scbAlle.pack(side="left", fill="y")
+
+        # buAlleAnzeigen = tkinter.Button(
+        #     main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
+        # )
+        # buAlleAnzeigen.place(x=380, y=290)
 
         """Tab5 Treeview."""
         tree = ttk.Treeview(self.tab6, columns=(config.recipe[0]))
@@ -258,9 +285,7 @@ class Tabs:
         recipe = 0
         column = 0
         while column < len(config.recipe[0]):
-            cursor.execute(sql_conf)
-            column = cursor.fetchall()
-            tree.column(row[1], width=config.recipe[2][0])
+            tree.column(config.recipe[0][column], width=config.recipe[2][0])
             tree.heading(config.recipe[0][column], text=config.recipe[1][column])
             column += 1
         while recipe < len(config.recipe[-1]):
@@ -283,7 +308,6 @@ class Tabs:
             recipe += 1
 
         tree.pack(side="right", anchor="nw", fill="both", expand=True)
-        con.close()
 
     def meals(self):
         """Tab6 Meal Sidebar."""
@@ -937,7 +961,7 @@ def top_window(args):
             def name():
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
-                sql = "SELECT rec_cat FROM recipes_tree_config"
+                sql = "SELECT * FROM rec_cat"
                 cursor.execute(sql)
                 lxName.delete(0, "end")
                 for dsatz in cursor:
@@ -947,17 +971,27 @@ def top_window(args):
             def ingredient():
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
-                sql = "SELECT rec_ingredient FROM recipes_tree_config"
+                sql = "SELECT * FROM rec_cat"
                 cursor.execute(sql)
                 lxIngredient.delete(0, "end")
                 for dsatz in cursor:
                     lxIngredient.insert("end", dsatz[0])
                 con.close()
 
+            def measurement():
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                sql = "SELECT * FROM rec_cat"
+                cursor.execute(sql)
+                lxMeasurement.delete(0, "end")
+                for dsatz in cursor:
+                    lxMeasurement.insert("end", dsatz[0])
+                con.close()
+
             def recipe():
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
-                sql = "SELECT rec_column_heading FROM recipes_tree_config"
+                sql = "SELECT * FROM rec_cat"
                 cursor.execute(sql)
                 lxRecipe.delete(0, "end")
                 for dsatz in cursor:
@@ -966,7 +1000,7 @@ def top_window(args):
 
             lbName = tkinter.Label(recipe_view, text="Rezept:")
             lbName.place(x=10, y=10)
-            lxName = tkinter.Listbox(recipe_view, width=55, height=2)
+            lxName = tkinter.Listbox(recipe_view, width=55, height=1)
             lxName.place(x=90, y=10)
 
             lbIngredient = tkinter.Label(recipe_view, text="Zutaten:")
@@ -976,11 +1010,24 @@ def top_window(args):
 
             scbIngredient = tkinter.Scrollbar(frIngredient, orient="vertical")
             lxIngredient = tkinter.Listbox(
-                frIngredient, width=55, height=8, yscrollcommand=scbIngredient.set
+                frIngredient, width=30, height=8, yscrollcommand=scbIngredient.set
             )
             scbIngredient["command"] = lxIngredient.yview
             lxIngredient.pack(side="left")
             scbIngredient.pack(side="left", fill="y")
+
+            lbMeasurement = tkinter.Label(recipe_view, text="Menge:")
+            lbMeasurement.place(x=400, y=40)
+            frMeasurement = tkinter.Frame(recipe_view)
+            frMeasurement.place(x=480, y=40)
+
+            scbMeasurement = tkinter.Scrollbar(frMeasurement, orient="vertical")
+            lxMeasurement = tkinter.Listbox(
+                frMeasurement, width=10, height=8, yscrollcommand=scbMeasurement.set
+            )
+            scbMeasurement["command"] = lxIngredient.yview
+            lxMeasurement.pack(side="left")
+            scbMeasurement.pack(side="left", fill="y")
 
             lbRecipe = tkinter.Label(recipe_view, text="Anleitung:")
             lbRecipe.place(x=10, y=200)
@@ -989,7 +1036,7 @@ def top_window(args):
 
             scbRecipe = tkinter.Scrollbar(frRecipe, orient="vertical")
             lxRecipe = tkinter.Listbox(
-                frRecipe, width=55, height=12, yscrollcommand=scbRecipe.set
+                frRecipe, width=53, height=12, yscrollcommand=scbRecipe.set
             )
             scbRecipe["command"] = lxRecipe.yview
             lxRecipe.pack(side="left")
@@ -998,7 +1045,7 @@ def top_window(args):
             buShow = tkinter.Button(
                 recipe_view,
                 text="Anzeigen",
-                command=lambda: [name(), ingredient(), recipe()],
+                command=lambda: [name(), ingredient(), measurement(), recipe()],
             )
             buShow.place(x=220, y=435)
 

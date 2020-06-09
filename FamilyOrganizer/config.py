@@ -190,6 +190,7 @@ def recipe():
     rec_categorie_sub1 = ["dir 2", "dir 3"]
     rec_categorie_sub2 = ["dir  2", "dir3  "]
     rec_ingredient = ["AAA", "BBB"]
+    rec_measurement = ["500 g", "250 g"]
 
     rec_cat = ["Suppe", "Nudel"]
 
@@ -202,6 +203,7 @@ def recipe():
         rec_categorie_sub1,
         rec_categorie_sub2,
         rec_ingredient,
+        rec_measurement,
         rec_cat,
     )
 
