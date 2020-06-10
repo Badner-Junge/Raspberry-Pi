@@ -181,30 +181,150 @@ def shop():
 
 
 def recipe():
-    """Config Recipe Treeview."""
-    rec_columns = ["1", "2"]
-    rec_heading = ["Zutaten", "Menge"]
-    rec_column_width = [70]
-    rec_categorie = [1, 2]
-    rec_categorie_dir = ["dir2", "dir3"]
-    rec_categorie_sub1 = ["dir 2", "dir 3"]
-    rec_categorie_sub2 = ["dir  2", "dir3  "]
-    rec_ingredient = ["AAA", "BBB"]
-    rec_measurement = ["500 g", "250 g"]
+    """Config (rec_conf) Treeview."""
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    id_conf = "SELECT id_config FROM rec_conf"
+    cursor.execute(id_conf)
+    id_config = []
+    for conf in cursor:
+        id_config.append(conf)
+    con.close()
 
-    rec_cat = ["Suppe", "Nudel"]
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    col = "SELECT columns FROM rec_conf"
+    cursor.execute(col)
+    rec_columns = []
+    for column in cursor:
+        rec_columns.append(column)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    head = "SELECT heading FROM rec_conf"
+    cursor.execute(head)
+    rec_heading = []
+    for heading in cursor:
+        rec_heading.append(heading)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    width = "SELECT width FROM rec_conf"
+    cursor.execute(width)
+    rec_column_width = []
+    for number in cursor:
+        rec_column_width.append(number)
+    con.close()
+
+    """Config (rec_cat) Treeview."""
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    id_cat = "SELECT id_categorie FROM rec_cat"
+    cursor.execute(id_cat)
+    id_categorie = []
+    for cat in cursor:
+        id_categorie.append(cat)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    categ = "SELECT categorie FROM rec_cat"
+    cursor.execute(categ)
+    rec_categorie = []
+    for cat in cursor:
+        rec_categorie.append(cat)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    cat_dir = "SELECT dir FROM rec_cat"
+    cursor.execute(cat_dir)
+    rec_categorie_dir = []
+    for Dir in cursor:
+        rec_categorie_dir.append(Dir)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    cat_sub1 = "SELECT sub1 FROM rec_cat"
+    cursor.execute(cat_sub1)
+    rec_categorie_sub1 = []
+    for sub1 in cursor:
+        rec_categorie_sub1.append(sub1)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    cat_sub2 = "SELECT sub2 FROM rec_cat"
+    cursor.execute(cat_sub2)
+    rec_categorie_sub2 = []
+    for sub2 in cursor:
+        rec_categorie_sub2.append(sub2)
+    con.close()
+
+    """Config (rec_recipe) Treeview."""
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    id_rec = "SELECT id_recipe FROM rec_recipe"
+    cursor.execute(id_rec)
+    id_recipe = []
+    for recip in cursor:
+        id_recipe.append(recip)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    nam = "SELECT name FROM rec_recipe"
+    cursor.execute(nam)
+    rec_name = []
+    for name in cursor:
+        rec_name.append(name)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    rec = "SELECT recipe FROM rec_recipe"
+    cursor.execute(rec)
+    rec_recipe = []
+    for recipe in cursor:
+        rec_recipe.append(recipe)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    ingr = "SELECT ingredient FROM rec_recipe"
+    cursor.execute(ingr)
+    rec_ingredient = []
+    for ingredient in cursor:
+        rec_ingredient.append(ingredient)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    meas = "SELECT measurement FROM rec_recipe"
+    cursor.execute(meas)
+    rec_measurement = []
+    for measurement in cursor:
+        rec_measurement.append(measurement)
+    con.close()
 
     return (
-        rec_columns,
-        rec_heading,
-        rec_column_width,
-        rec_categorie,
-        rec_categorie_dir,
-        rec_categorie_sub1,
-        rec_categorie_sub2,
-        rec_ingredient,
-        rec_measurement,
-        rec_cat,
+        id_config,  # 0
+        rec_columns,  # 1
+        rec_heading,  # 2
+        rec_column_width,  # 3
+        id_categorie,  # 4
+        rec_categorie,  # 5
+        rec_categorie_dir,  # 6
+        rec_categorie_sub1,  # 7
+        rec_categorie_sub2,  # 8
+        id_recipe,  # 9
+        rec_name,  # 10
+        rec_recipe,  # 11
+        rec_ingredient,  # 12
+        rec_measurement,  # 13
     )
 
 
