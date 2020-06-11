@@ -29,6 +29,12 @@ class Root(Tk):
         self.title("Family Organizer")
         self.attributes("-fullscreen", TRUE)
         self.minsize(512, 265)
+        self.bind(
+            "<<NotebookTabChanged>>",
+            lambda event: event.widget.winfo_children()[
+                event.widget.index("current")
+            ].update(),
+        )
 
         menu.menuBar.createMenu(self)
         modules.Tabs.cards(self)

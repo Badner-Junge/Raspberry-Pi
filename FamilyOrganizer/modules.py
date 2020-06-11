@@ -246,42 +246,6 @@ class Tabs:
                 command=val,
             ).pack(fill="y", expand=1)
 
-        """Tab5 open Database"""
-        # main = Toplevel()
-        # main["height"] = 480
-        # main["width"] = 600
-
-        # con = sqlite3.connect("family_data.db")
-        # cursor = con.cursor()
-        # sql = "SELECT * FROM recipes_tree_config"
-        # cursor.execute(sql)
-        # lxAlle.delete(0, "end")
-        # for dsatz in cursor:
-        #     lxAlle.insert("end", dsatz[1] + "; " + dsatz[2] + "; " + dsatz[3])
-        # con.close()
-
-        # main = Toplevel()
-        # main["height"] = 480
-        # main["width"] = 600
-
-        # lbListe = tk.Label(main, text="Alle Vokabeln:")
-        # lbListe.place(x=10, y=260)
-        # frListe = tk.Frame(main)
-        # frListe.place(x=10, y=290)
-
-        # scbAlle = tk.Scrollbar(frListe, orient="vertical")
-        # lxAlle = tk.Listbox(
-        #     frListe, width=40, height=7, yscrollcommand=scbAlle.set
-        # )
-        # scbAlle["command"] = lxAlle.yview
-        # lxAlle.pack(side="left")
-        # scbAlle.pack(side="left", fill="y")
-
-        # buAlleAnzeigen = tk.Button(
-        #     main, text="Alle Vokabeln anzeigen", command=alleAnzeigen
-        # )
-        # buAlleAnzeigen.place(x=380, y=290)
-
         """Tab5 Treeview."""
         tree = ttk.Treeview(self.tab6, columns=(config.recipe[1]))
         # tree["columns"] = ("one", "two")
@@ -299,10 +263,10 @@ class Tabs:
                 text=config.recipe[5][recipe],
             )
             cat_sub1 = tree.insert(
-                cat, "end", config.recipe[7][recipe], text=config.recipe[10], values=10,
+                cat, "end", config.recipe[7][recipe], text=config.recipe[11], values=10,
             )
             # cat_sub2 = tree.insert(
-            #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[11],
+            #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
             # )
             recipe += 1
 
@@ -1094,14 +1058,40 @@ def top_window(args):
                 ).grid(column=1, columnspan=2)
         elif args == 33:
             """neue Kategorie."""
+            mystring = StringVar()
+
+            # neue Kategorie in Datenbank schreiben
+            def commit():
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                cursor.execute("SELECT max(id_categorie) FROM rec_cat")
+                max_id = cursor.fetchone()[-1]
+                new_categorie = mystring.get()
+                iD = int(max_id) + 1
+                Dir = "dir" + str((max_id + 2))
+                Sub1 = "dir " + str((max_id + 2))
+                Sub2 = "dir  " + str((max_id + 2))
+                cursor.execute(
+                    "INSERT INTO rec_cat(id_categorie, categorie, dir, sub1, sub2) VALUES(?, ?, ?, ?, ?)",
+                    (iD, new_categorie, Dir, Sub1, Sub2),
+                )
+                con.commit()
+                cursor.close()
+                con.close()
+                categorie_new.destroy()
+
             categorie_new = Toplevel()
             categorie_new.title(config.sidebar_buttons[6][2][0])
             categorie_new.geometry("+%d+%d" % (400, 200))
             cat_new_label = tk.Label(categorie_new, text="Neue Kategorie:").grid(
                 column=1, row=1
             )
-            cat_new_entry = tk.Entry(categorie_new).grid(column=2, row=1)
-            cat_new_button1 = tk.Button(categorie_new, text="OK").grid(column=1, row=2)
+            cat_new_entry = tk.Entry(categorie_new, textvariable=mystring).grid(
+                column=2, row=1
+            )
+            cat_new_button1 = tk.Button(categorie_new, text="OK", command=commit).grid(
+                column=1, row=2
+            )
             cat_new_button2 = tk.Button(
                 categorie_new, text="Abbrechen", command=categorie_new.destroy
             ).grid(column=2, row=2)
@@ -1158,7 +1148,7 @@ def top_window(args):
                 lxMeasurement.yview(*args)
                 lxIngredient.yview(*args)
 
-            OptionList = config.recipe[-1]
+            OptionList = config.recipe[5]
 
             variable = tk.StringVar()
             variable.set(OptionList[0])

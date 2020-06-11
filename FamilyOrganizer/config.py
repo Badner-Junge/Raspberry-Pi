@@ -276,6 +276,15 @@ def recipe():
 
     con = sqlite3.connect("family_data.db")
     cursor = con.cursor()
+    nam_cat = "SELECT rec_categorie FROM rec_recipe"
+    cursor.execute(nam_cat)
+    rec_name_cat = []
+    for name_cat in cursor:
+        rec_name_cat.append(name_cat)
+    con.close()
+
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
     nam = "SELECT name FROM rec_recipe"
     cursor.execute(nam)
     rec_name = []
@@ -321,10 +330,11 @@ def recipe():
         rec_categorie_sub1,  # 7
         rec_categorie_sub2,  # 8
         id_recipe,  # 9
-        rec_name,  # 10
-        rec_recipe,  # 11
-        rec_ingredient,  # 12
-        rec_measurement,  # 13
+        rec_name_cat,  # 10
+        rec_name,  # 11
+        rec_recipe,  # 12
+        rec_ingredient,  # 13
+        rec_measurement,  # 14
     )
 
 
