@@ -319,6 +319,8 @@ def recipe():
         rec_measurement.append(measurement)
     con.close()
 
+    timeList = ["schnell", "mittel", "lang"]
+
     return (
         id_config,  # 0
         rec_columns,  # 1
@@ -335,6 +337,7 @@ def recipe():
         rec_recipe,  # 12
         rec_ingredient,  # 13
         rec_measurement,  # 14
+        timeList,  # 15
     )
 
 
