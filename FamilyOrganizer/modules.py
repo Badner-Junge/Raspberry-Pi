@@ -14,15 +14,16 @@ import config, datetime, tkcalendar, tkinter.messagebox, time, sys, threading, s
 import tkinter as tk
 import RPi.GPIO as GPIO
 
-"""Open Database"""
-con = sqlite3.connect("family_data.db")
-cursor = con.cursor()
+# """Open Database"""
+# con = sqlite3.connect("family_data.db")
+# cursor = con.cursor()
 # Tabs und Inhalt erzeugen und verwalten
 class Tabs:
     """Manage Tabs."""
 
     def cards(self):
         """Create Tabs."""
+        global tabControl
         tabControl = ttk.Notebook(self, style="main.TNotebook")
 
         self.tab1 = ttk.Frame(tabControl)
@@ -232,6 +233,7 @@ class Tabs:
     def recipes(self):
         """Tab5 Recipes Sidebar."""
         tab = 6
+        global tree, recipe, categorie, index
 
         rec_frame_buttons = tk.Frame(self.tab6)
         rec_frame_buttons.pack(side="right", anchor="e", fill="y")
@@ -251,30 +253,52 @@ class Tabs:
         column = 0
         categorie = 0
         recipe = 0
-        while column < len(config.recipe[1]):
+
+        # Erzeugt Spalten
+        for col in config.recipe[1]:
             tree.column(config.recipe[1][column], width=config.recipe[3][0])
             tree.heading(config.recipe[1][column], text=config.recipe[2][column])
             column += 1
-        for a in config.recipe[4]:
+        
+        # Erzeugt Kategorien
+        for cat in config.recipe[4]:
             cat = tree.insert(
                 "",
                 config.recipe[4][categorie],
                 config.recipe[6][categorie],
                 text=config.recipe[5][categorie],
             )
-            categorie += 1
-        for i in config.recipe[9]:
-            cat_sub1 = tree.insert(
-                cat,
-                "end",
-                config.recipe[7][recipe],
-                text=config.recipe[11][recipe],
-                values=10,
+            # print(config.recipe[5][categorie])
+            rec = config.recipe[5][categorie]
+            con = sqlite3.connect("family_data.db")
+            cursor = con.cursor()
+            cursor.execute(
+                "SELECT * FROM rec_recipe WHERE rec_categorie LIKE ?",
+                ("%" + str(rec)[2:-3] + "%",),
             )
+            rec_cat = cursor.fetchall()
+
+            # Setzt vorhandene Rezepte in Kategorien ein
+            index = 0
+            for i in rec_cat:
+                tree.insert(
+                    cat,
+                    "end",
+                    i + config.recipe[7][index],
+                    text=rec_cat[index][2],
+                    values=[rec_cat[index][6], rec_cat[index][7]],
+                )
+                index += 1
+            # print("rec_cat: ", rec_cat)
+            # print("")
+            cursor.close()
+            con.close()
             recipe += 1
-            # cat_sub2 = tree.insert(
-            #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
-            # )
+            categorie += 1
+
+        # cat_sub2 = tree.insert(
+        #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
+        # )
 
         tree.pack(side="right", anchor="nw", fill="both", expand=True)
 
@@ -1123,25 +1147,36 @@ def top_window(args):
                 con.commit()
                 cursor.close()
                 con.close()
-                print(iD, new_categorie, Dir, Sub1, Sub2)
-                print(type(iD), type(new_categorie), type(Dir), type(Sub1), type(Sub2))
                 categorie_new.destroy()
+
+            # neue Kategorie dynamisch in Tree einfügen
+            def refresh():
+                tree.insert("", "end", cat_new.get(), text=cat_new.get())
+
+            def entry_return(event):
+                commit()
+                refresh()
 
             categorie_new = Toplevel()
             categorie_new.title(config.sidebar_buttons[6][2][0])
             categorie_new.geometry("+%d+%d" % (400, 200))
-            cat_new_label = tk.Label(categorie_new, text="Neue Kategorie:").grid(
-                column=1, row=1
+
+            cat_new_label = tk.Label(categorie_new, text="Neue Kategorie:")
+            cat_new_label.grid(column=1, row=1)
+
+            cat_new_entry = tk.Entry(categorie_new, textvariable=cat_new)
+            cat_new_entry.grid(column=2, row=1)
+            cat_new_entry.focus()
+            cat_new_entry.bind("<Return>", entry_return)
+
+            cat_new_button1 = tk.Button(
+                categorie_new, text="OK", command=lambda: [commit(), refresh()]
             )
-            cat_new_entry = tk.Entry(categorie_new, textvariable=cat_new).grid(
-                column=2, row=1
-            )
-            cat_new_button1 = tk.Button(categorie_new, text="OK", command=commit).grid(
-                column=1, row=2
-            )
+            cat_new_button1.grid(column=1, row=2)
             cat_new_button2 = tk.Button(
                 categorie_new, text="Abbrechen", command=categorie_new.destroy
-            ).grid(column=2, row=2)
+            )
+            cat_new_button2.grid(column=2, row=2)
         elif args == 34:
             """Neues Rezept."""
             recipe_new = Toplevel()
@@ -1150,16 +1185,19 @@ def top_window(args):
             recipe_new["height"] = 480
             recipe_new["width"] = 600
 
+            # Rückgabewerte
             Name = StringVar()
             Categorie = StringVar()
             Time = StringVar()
 
+            # Rezept in Datenbank schreiben
             def commit():
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
                 cursor.execute("SELECT max(id_recipe) FROM rec_recipe")
                 max_id = cursor.fetchone()[-1]
                 index = int(max_id) + 1
+                meal = ""
                 name = Name.get()
                 cat = Categorie.get()
                 time = Time.get()
@@ -1167,19 +1205,24 @@ def top_window(args):
                 Ingredient = str(txIngredient.get(1.0, END))
                 Measurement = str(txMeasurement.get(1.0, END))
                 cursor.execute(
-                    "INSERT INTO rec_recipe(id_recipe, rec_categorie, name, recipe, ingredient, measurement, time) VALUES(?, ?, ?, ?, ?, ?, ?)",
-                    (index, cat, name, Recipe, Ingredient, Measurement, time),
+                    "INSERT INTO rec_recipe(id_recipe, rec_categorie, name, recipe, ingredient, measurement, time, meal) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                    (index, cat[2:-3], name, Recipe, Ingredient, Measurement, time, meal),
                 )
                 con.commit()
                 cursor.close()
                 con.close()
                 recipe_new.destroy()
 
+            def refresh():
+                pass
+                # tree.insert("", "end", cat_new.get(), text=cat_new.get())
+
             def multi_scrollbar(*args):
                 txMeasurement.yview(*args)
                 txIngredient.yview(*args)
 
-            OptionList = config.recipe[5]
+            # Cropdown Menü
+            OptionList = config.recipe[16]
             timeList = config.recipe[15]
 
             option = tk.StringVar()
@@ -1192,6 +1235,7 @@ def top_window(args):
             lbName.place(x=10, y=10)
             txName = tk.Entry(recipe_new, textvariable=Name, width=55)
             txName.place(x=90, y=10)
+            txName.focus()
 
             lbCategorie = tk.Label(recipe_new, text="Kategorie:")
             lbCategorie.place(x=10, y=40)
@@ -1246,6 +1290,7 @@ def top_window(args):
             txRecipe.pack(side="left")
             scbRecipe.pack(side="left", fill="y")
 
+            # Untere Buttons
             buSave = tk.Button(recipe_new, text="Speichern", command=commit)
             buSave.place(x=220, y=445)
 

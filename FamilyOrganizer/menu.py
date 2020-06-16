@@ -30,6 +30,7 @@ class menuBar:
         menubar.add_cascade(label="Optionen", menu=option_menu)
         option_menu.add_command(label="Vollbild", command=self.fullscreen_toggle)
         option_menu.add_command(label="Lüftersteuerung")
+        option_menu.add_command(label="Refresh")
 
         help_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=help_menu)

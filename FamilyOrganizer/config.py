@@ -321,6 +321,8 @@ def recipe():
 
     timeList = ["schnell", "mittel", "lang"]
 
+    categorieList = rec_categorie
+
     return (
         id_config,  # 0
         rec_columns,  # 1
@@ -338,6 +340,7 @@ def recipe():
         rec_ingredient,  # 13
         rec_measurement,  # 14
         timeList,  # 15
+        categorieList,  # 16
     )
 
 
