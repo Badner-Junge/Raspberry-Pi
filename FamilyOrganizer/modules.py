@@ -263,7 +263,7 @@ class Tabs:
             global selection_rec
             for item in tree.selection():
                 selection_rec = tree.item(item, "text")
-                print(selection_rec)
+                # print(selection_rec)
 
         tree.bind("<<TreeviewSelect>>", on_tree_select)
 
@@ -1220,7 +1220,7 @@ def top_window(args):
                 categorie_new, text="Abbrechen", command=categorie_new.destroy
             )
             cat_new_button2.grid(column=2, row=2)
-        # TODO neues Rezept
+        # ANCHOR neues Rezept
         elif args == 34:
             """Neues Rezept."""
             # Fenster erzeugen
@@ -1246,10 +1246,13 @@ def top_window(args):
                 meal = ""
                 name = Name.get()
                 cat = Categorie.get()
+                catList = []
                 time = Time.get()
                 Recipe = str(txRecipe.get(1.0, END))
                 Ingredient = str(txIngredient.get(1.0, END))
                 Measurement = str(txMeasurement.get(1.0, END))
+
+                # Rezept in Datenbank schreiben
                 cursor.execute(
                     "INSERT INTO rec_recipe(id_recipe, rec_categorie, name, recipe, ingredient, measurement, time, meal) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                     (
@@ -1263,25 +1266,25 @@ def top_window(args):
                         meal,
                     ),
                 )
+                catList.append(cat)
                 con.commit()
                 cursor.close()
                 con.close()
-                recipe_new.destroy()
 
-            # neues Rezept dynamisch in Tree einfügen
-            def refresh():
+                # Kategorie zum Einsetzen in Treeview auslesen
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
                 cursor.execute(
-                    "SELECT dir FROM rec_cat WHERE categorie = ?",
-                    ("%" + str(Categorie.get()) + "%",),
+                    "SELECT dir FROM rec_cat WHERE categorie LIKE ?",
+                    ("%" + str(catList[0][2:-3]) + "%",),
                 )
                 cat_dir = cursor.fetchone()
-                # dir_cat = []
-                # for dsatz in cat_dir:
-                #     dir_cat.append(dsatz)
-                print(cat_dir)
-                # tree.insert(cat_dir, "end", text=Name.get(), values=[Time.get()])
+                cursor.close()
+                con.close()
+
+                # Rezept dynamisch in Treeview einfügen
+                tree.insert(cat_dir, "end", text=Name.get(), values=[Time.get()])
+                recipe_new.destroy()
 
             # Scrollbarverknüpfung Zutaten und Mengen
             def multi_scrollbar(*args):
