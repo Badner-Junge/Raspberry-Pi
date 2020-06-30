@@ -10,537 +10,476 @@ from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from config import *
-from functools import partial
 import config, datetime, tkcalendar, tkinter.messagebox, time, sys, threading, sqlite3
 import tkinter as tk
 import RPi.GPIO as GPIO
-import importlib
 
 # SECTION Tabs
-class Tabs:
-    """Manage Tabs."""
-
-    # ANCHOR Reiter
-    def cards(self):
-        """Create Tabs."""
-        global tabControl, tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8
-        tabControl = ttk.Notebook(self, style="main.TNotebook")
-
-        self.tab1 = ttk.Frame(tabControl)
-        tabControl.add(self.tab1, text="Übersicht")
-        Tabs.overview(self)
-        # print(tabControl.index(tabControl.select()))
-
-        self.tab2 = ttk.Frame(tabControl)
-        tabControl.add(self.tab2, text="To-Do")
-        Tabs.to_do(self)
-
-        self.tab3 = ttk.Frame(tabControl)
-        tabControl.add(self.tab3, text="Kinder")
-        Tabs.kids(self)
-        # print(tabControl.tab(tabControl.select(), "text"))
-
-        self.tab4 = ttk.Frame(tabControl)
-        tabControl.add(self.tab4, text="Kalender")
-        Tabs.calendar(self)
-
-        self.tab5 = ttk.Frame(tabControl)
-        tabControl.add(self.tab5, text="Einkaufen")
-        Tabs.shopping(self)
-
-        self.tab6 = ttk.Frame(tabControl)
-        tabControl.add(self.tab6, text="Rezepte")
-        Tabs.recipes(self)
-
-        self.tab7 = ttk.Frame(tabControl)
-        tabControl.add(self.tab7, text="Essensplan")
-        Tabs.meals(self)
-
-        self.tab8 = ttk.Frame(tabControl)
-        tabControl.add(self.tab8, text="Hahabu")
-        Tabs.household(self)
-
-        tabControl.pack(expand=1, fill="both")
-
-        # tabControl.bind("<<NotebookTabSelected>>", refresh)
-        # tabControl.bind("<ButtonRelease-1>", refresh())
-
-        buRefresh = tk.Button(
-            tabControl, text="Refresh", width=7, height=3, command=refresh
-        ).place(x=65, y=480)
-
-        self.tab_control = tabControl
-
-    # ANCHOR Übersicht
-    def overview(self):
-        """Tab1 Overview Sidebar."""
-        tab = 1
-        width = config.sidebar_buttons[8][0]
-
-        view_frame_buttons = tk.Frame(self.tab1)
-        view_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                view_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        view_frame_progress = tk.Frame(self.tab1)
-        view_frame_progress.pack(side="right", anchor="e", fill="y")
-
-        prog_1 = ttk.Progressbar(
-            view_frame_progress, orient="vertical", length=500, mode="determinate",
-        )
-        prog_1.pack(side="right")
-        prog_1["maximum"] = 100
-        prog_1["value"] = 50
-
-        prog_2 = ttk.Progressbar(
-            view_frame_progress, orient="vertical", length=500, mode="determinate",
-        )
-        prog_2.pack(side="right", fill="y")
-        prog_2["maximum"] = 100
-        prog_2["value"] = 20
-
-    # ANCHOR To-Do
-    def to_do(self):
-        """Tab2 To-Do Sidebar."""
-        tab = 2
-
-        todo_frame_buttons = tk.Frame(self.tab2)
-        todo_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                todo_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-    # ANCHOR Kinder
-    def kids(self):
-        """Tab2 Kids Sidebar."""
-        tab = 3
-
-        kids_frame_buttons = tk.Frame(self.tab3)
-        kids_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                kids_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        """Tab3 Register."""
-        kids_frame = tk.Frame(self.tab3)
-        kids_frame.pack(side="right", anchor="n", fill="both", expand=1)
-
-        tabkids = ttk.Notebook(kids_frame, style="kids.TNotebook")
-
-        self.tabkids1 = ttk.Frame(tabkids)
-        tabkids.add(self.tabkids1, text="Fabienne")
-
-        self.tabkids2 = ttk.Frame(tabkids)
-        tabkids.add(self.tabkids2, text="Mio")
-
-        self.tabkids3 = ttk.Frame(tabkids)
-        tabkids.add(self.tabkids3, text="Mika")
-
-        self.tabkids4 = ttk.Frame(tabkids)
-        tabkids.add(self.tabkids4, text="Jona")
-
-        tabkids.pack(expand=1, fill="both")
-
-        self.tab_kids = tabkids
-
-    # ANCHOR Kalender
-    def calendar(self):
-        """Tab3 Calendar Sidebar."""
-        tab = 4
-
-        cal_frame_buttons = tk.Frame(self.tab4)
-        cal_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                cal_frame_buttons,
-                text=txt,
-                bg=col,
-                padx=0,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        """Tab4 Calendar."""
-        events = {
-            "2020-06-28": ("London", "meeting"),
-            "2020-06-15": ("Paris", "meeting"),
-            "2020-06-30": ("New York", "meeting"),
-        }
-        cal = Calendar(self.tab4, selectmode="day")
-
-        for k in events.keys():
-            date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
-            cal.calevent_create(date, events[k][0], events[k][1])
-
-        cal.tag_config(
-            "meeting", background=config.calendar[0], foreground=config.calendar[1]
-        )
-        cal.pack(side="right", fill="both", expand=1)
-
-    # ANCHOR Einkaufen
-    def shopping(self):
-        """Tab5 Shopping Sidebar."""
-        tab = 5
-
-        shop_frame_buttons = tk.Frame(self.tab5)
-        shop_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                shop_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        """Tab5 Listbox."""
-        Listbox(self.tab5).pack(side="right", fill="both", expand=True)
-
-        """Tab5 Treeview."""
-        shop_tree = ttk.Treeview(self.tab5)
-
-        cat1 = shop_tree.insert("", 1, "dir2", text=config.shop[-1][0])
-        shop_tree.insert(
-            cat1, "end", "dir 2", text=config.shop[0][2], values=(config.shop[0][3])
-        )
-
-        cat2 = shop_tree.insert("", 2, "dir3", text=config.shop[-1][1])
-        shop_tree.insert(
-            cat2, "end", "dir 3", text=config.shop[1][2], values=(config.shop[1][3])
-        )
-
-        cat3 = shop_tree.insert("", 3, "dir4", text=config.shop[-1][2])
-        shop_tree.insert(
-            cat3, "end", "dir 4", text=config.shop[2][2], values=(config.shop[2][3])
-        )
-
-        shop_tree.pack(side="right", anchor="nw", fill="both", expand=True)
-
-    # ANCHOR Rezepte
-    def recipes(self):
-        """Tab5 Recipes Sidebar."""
-        global recipes_tree, selection_rec
-        tab = 6
-
-        rec_frame_buttons = tk.Frame(self.tab6)
-        rec_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                rec_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        """Tab5 Treeview."""
-
-        def recipes_tree():
-            global tree, scbTree, recipe, categorie, index, rec_cat, selection_rec
-            tree = ttk.Treeview(self.tab6, columns=(config.recipe[1]))
-            column = 0
-            categorie = 0
-            recipe = 0
-
-            # Selektion Rückgabewert
-            def on_tree_select(self):
-                global selection_rec
-                for item in tree.selection():
-                    selection_rec = tree.item(item, "text")
-                    # print(selection_rec)
-
-            tree.bind("<<TreeviewSelect>>", on_tree_select)
-
-            # Sortierung durch Spalte
-            def treeview_sort_column(tv, col, reverse):
-                l = [(tree.set(k, col), k) for k in tree.get_children("")]
-                l.sort(reverse=reverse)
-
-                # rearrange items in sorted positions
-                for index, (val, k) in enumerate(l):
-                    tree.move(k, "", index)
-
-                # reverse sort next time
-                tree.heading(
-                    col,
-                    command=lambda _col=col: treeview_sort_column(
-                        tree, _col, not reverse
-                    ),
-                )
-
-            for col in config.recipe[1]:
-                tree.heading(
-                    col,
-                    text=col,
-                    command=lambda _col=col: treeview_sort_column(tree, _col, False),
-                )
-
-            # Erzeuge Scrollbar
-            scbTree = tk.Scrollbar(self.tab6, orient="vertical", command=tree.yview)
-            scbTree.pack(side="right", fill="y")
-            tree.configure(yscrollcommand=scbTree.set)
-
-            # Erzeugt Spalten
-            for col in config.recipe[1]:
-                tree.column(config.recipe[1][column], width=config.recipe[3][0])
-                tree.heading(config.recipe[1][column], text=config.recipe[2][column])
-                column += 1
-
-            # Erzeugt Kategorien
-            for cat in config.recipe[4]:
-                rec = config.recipe[5][categorie]
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT * FROM rec_recipe WHERE rec_categorie LIKE ?",
-                    ("%" + str(rec)[2:-3] + "%",),
-                )
-                rec_cat = cursor.fetchall()
-                cat = tree.insert(
-                    "",
-                    config.recipe[4][categorie],
-                    config.recipe[6][categorie],
-                    text=config.recipe[5][categorie],
-                )
-                # print(rec_cat)
-                cursor.close()
-                con.close()
-
-                # Setzt vorhandene Rezepte in Kategorien ein
-                index = -1
-                for i in rec_cat:
-                    index += 1
-                    tree.insert(
-                        cat,
-                        "end",
-                        i + config.recipe[7][index],
-                        text=rec_cat[index][2],
-                        values=[
-                            rec_cat[index][6],
-                            # rec_cat[index][7],
-                            rec_cat[index][7] or rec_cat[index][8],
-                        ],
-                    )
-                recipe += 1
-                categorie += 1
-
-                # cat_sub2 = tree.insert(
-                #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
-                # )
-
-            tree.pack(side="right", anchor="nw", fill="both", expand=True)
-
-        recipes_tree()
-
-    # ANCHOR Essensplan
-    def meals(self):
-        """Tab6 Meal Sidebar."""
-        global this_week, next_week, button_identities, change, bname, bcount1, n, identities_reset
-        tab = 7
-        button_identities = []
-
-        def identities_reset():
-            del button_identities[:14]
-
-        def change(n):
-            global bname, bcount1
-            bname = button_identities[n]
-            bcount1 = []
-            bcount1.append(n + 1)
-
-        meal_frame_buttons = tk.Frame(self.tab7)
-        meal_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                meal_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        """Tab6 Days."""
-        v = IntVar()
-        v.set(0)
-
-        day_frame = tk.Frame(self.tab7)
-        day_frame.pack(side="left", fill="both", expand=True)
-        Label1 = Label(
-            day_frame, text="Wochentag", bd=5, relief="sunken", font="Times 24 bold"
-        ).pack()
-
-        for txt in config.meal[1]:
-            Label(day_frame, text=txt, font="Times 24").pack(fill="y", expand=True)
-
-        """Tab6 Frame this week."""
-
-        def this_week():
-            global this_week_frame
-            i = 0
-            week1_list = []
-
-            this_week_frame = tk.Frame(self.tab7)
-            this_week_frame.pack(side="left", fill="y", expand=True)
-            Label2 = Label(
-                this_week_frame,
-                text="aktuelle Woche",
-                bd=5,
-                relief="sunken",
-                font="Times 24 bold",
-            ).pack()
-
-            for txt in config.meal[1]:
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT name FROM rec_recipe WHERE week1 LIKE ?",
-                    (str(txt)[2:-3] + "%",),
-                )
-                week1 = cursor.fetchall()
-                cursor.close()
-                con.close()
-                week1_list.append(week1)
-
-                button = Radiobutton(
-                    this_week_frame,
-                    text=str(week1)[3:-4],
-                    indicatoron=0,
-                    width=16,
-                    padx=10,
-                    variable=v,
-                    value=val,
-                    command=partial(change, i),
-                    font="Times 18",
-                )
-                button.pack(fill="y", expand=True)
-                button_identities.append(button.cget("text"))
-                i += 1
-
-        """Tab6 Frame next week."""
-
-        def next_week():
-            global next_week_frame
-            i = 7
-            week2_list = []
-
-            next_week_frame = tk.Frame(self.tab7)
-            next_week_frame.pack(side="left", fill="y", expand=True)
-            Label3 = Label(
-                next_week_frame,
-                text="nächste Woche",
-                bd=5,
-                relief="sunken",
-                font="Times 24 bold",
-            ).pack()
-
-            for txt in config.meal[1]:
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT name FROM rec_recipe WHERE week2 LIKE ?",
-                    (str(txt)[2:-3] + "%",),
-                )
-                week2 = cursor.fetchall()
-                cursor.close()
-                con.close()
-                week2_list.append(week2)
-
-                button2 = Radiobutton(
-                    next_week_frame,
-                    text=str(week2)[3:-4],
-                    indicatoron=0,
-                    width=16,
-                    padx=10,
-                    variable=v,
-                    value=val,
-                    command=partial(change, i),
-                    font="Times 18",
-                )
-                button2.pack(fill="y", expand=True)
-                button_identities.append(button2.cget("text"))
-                i += 1
-
-        this_week()
-        next_week()
-        # change()
-
-    # ANCHOR Haushaltsbuch
-    def household(self):
-        """Tab8 Household Sidebar."""
-        tab = 8
-
-        home_frame_buttons = tk.Frame(self.tab8)
-        home_frame_buttons.pack(side="right", anchor="e", fill="y")
-
-        for txt, col, val in config.sidebar_buttons[tab]:
-            Button(
-                home_frame_buttons,
-                text=txt,
-                bg=col,
-                width=config.sidebar_buttons[0][0],
-                font=config.sidebar_buttons[0][1],
-                command=val,
-            ).pack(fill="y", expand=1)
-
-        budget_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
-        budget_frame.pack(side="top", fill="y")
-
-        budget_in_label = tk.Label(budget_frame, text="Einnahmen: ").grid(
-            column=1, row=1
-        )
-        budget_in_last = tk.Label(budget_frame, text="20,00€ (letzte: 10,00€)").grid(
-            column=2, row=1
+# class Tabs:
+"""Manage Tabs."""
+
+# ANCHOR Reiter
+def cards(self):
+    """Create Tabs."""
+    global tabControl
+    tabControl = ttk.Notebook(self, style="main.TNotebook")
+
+    overview(self)
+    # print(tabControl.index(tabControl.select()))
+    to_do(self)
+    kids(self)
+    # print(tabControl.tab(tabControl.select(), "text"))
+    calendar(self)
+    shopping(self)
+    recipes(self)
+    meals(self)
+    household(self)
+
+    tabControl.pack(expand=1, fill="both")
+
+    # tabControl.bind("<<NotebookTabSelected>>", refresh)
+    tabControl.bind("<ButtonRelease-1>", refresh)
+
+    buRefresh = tk.Button(tabControl, text="Test", command=cards).place(x=10, y=10)
+
+    self.tab_control = tabControl
+
+
+# ANCHOR Übersicht
+def overview(self):
+    """Tab1 Overview Sidebar."""
+    self.tab1 = ttk.Frame(tabControl)
+    tabControl.add(self.tab1, text="Übersicht")
+    tab = 1
+    width = config.sidebar_buttons[8][0]
+
+    view_frame_buttons = tk.Frame(self.tab1)
+    view_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            view_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    view_frame_progress = tk.Frame(self.tab1)
+    view_frame_progress.pack(side="right", anchor="e", fill="y")
+
+    prog_1 = ttk.Progressbar(
+        view_frame_progress, orient="vertical", length=500, mode="determinate",
+    )
+    prog_1.pack(side="right")
+    prog_1["maximum"] = 100
+    prog_1["value"] = 50
+
+    prog_2 = ttk.Progressbar(
+        view_frame_progress, orient="vertical", length=500, mode="determinate",
+    )
+    prog_2.pack(side="right", fill="y")
+    prog_2["maximum"] = 100
+    prog_2["value"] = 20
+
+
+# ANCHOR To-Do
+def to_do(self):
+    """Tab2 To-Do Sidebar."""
+    self.tab2 = ttk.Frame(tabControl)
+    tabControl.add(self.tab2, text="To-Do")
+    tab = 2
+
+    todo_frame_buttons = tk.Frame(self.tab2)
+    todo_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            todo_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+
+# ANCHOR Kinder
+def kids(self):
+    """Tab2 Kids Sidebar."""
+    self.tab3 = ttk.Frame(tabControl)
+    tabControl.add(self.tab3, text="Kinder")
+    tab = 3
+
+    kids_frame_buttons = tk.Frame(self.tab3)
+    kids_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            kids_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    """Tab3 Register."""
+    kids_frame = tk.Frame(self.tab3)
+    kids_frame.pack(side="right", anchor="n", fill="both", expand=1)
+
+    tabkids = ttk.Notebook(kids_frame, style="kids.TNotebook")
+
+    self.tabkids1 = ttk.Frame(tabkids)
+    tabkids.add(self.tabkids1, text="Fabienne")
+
+    self.tabkids2 = ttk.Frame(tabkids)
+    tabkids.add(self.tabkids2, text="Mio")
+
+    self.tabkids3 = ttk.Frame(tabkids)
+    tabkids.add(self.tabkids3, text="Mika")
+
+    self.tabkids4 = ttk.Frame(tabkids)
+    tabkids.add(self.tabkids4, text="Jona")
+
+    tabkids.pack(expand=1, fill="both")
+
+    self.tab_kids = tabkids
+
+
+# ANCHOR Kalender
+def calendar(self):
+    """Tab3 Calendar Sidebar."""
+    self.tab4 = ttk.Frame(tabControl)
+    tabControl.add(self.tab4, text="Kalender")
+    tab = 4
+
+    cal_frame_buttons = tk.Frame(self.tab4)
+    cal_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            cal_frame_buttons,
+            text=txt,
+            bg=col,
+            padx=0,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    """Tab4 Calendar."""
+    events = {
+        "2020-06-28": ("London", "meeting"),
+        "2020-06-15": ("Paris", "meeting"),
+        "2020-06-30": ("New York", "meeting"),
+    }
+    cal = Calendar(self.tab4, selectmode="day")
+
+    for k in events.keys():
+        date = datetime.datetime.strptime(k, "%Y-%m-%d").date()
+        cal.calevent_create(date, events[k][0], events[k][1])
+
+    cal.tag_config(
+        "meeting", background=config.calendar[0], foreground=config.calendar[1]
+    )
+    cal.pack(side="right", fill="both", expand=1)
+
+
+# ANCHOR Einkaufen
+def shopping(self):
+    """Tab5 Shopping Sidebar."""
+    self.tab5 = ttk.Frame(tabControl)
+    tabControl.add(self.tab5, text="Einkaufen")
+    tab = 5
+
+    shop_frame_buttons = tk.Frame(self.tab5)
+    shop_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            shop_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    """Tab5 Listbox."""
+    Listbox(self.tab5).pack(side="right", fill="both", expand=True)
+
+    """Tab5 Treeview."""
+    shop_tree = ttk.Treeview(self.tab5)
+
+    cat1 = shop_tree.insert("", 1, "dir2", text=config.shop[-1][0])
+    shop_tree.insert(
+        cat1, "end", "dir 2", text=config.shop[0][2], values=(config.shop[0][3])
+    )
+
+    cat2 = shop_tree.insert("", 2, "dir3", text=config.shop[-1][1])
+    shop_tree.insert(
+        cat2, "end", "dir 3", text=config.shop[1][2], values=(config.shop[1][3])
+    )
+
+    cat3 = shop_tree.insert("", 3, "dir4", text=config.shop[-1][2])
+    shop_tree.insert(
+        cat3, "end", "dir 4", text=config.shop[2][2], values=(config.shop[2][3])
+    )
+
+    shop_tree.pack(side="right", anchor="nw", fill="both", expand=True)
+
+
+# ANCHOR Rezepte
+def recipes(self):
+    """Tab5 Recipes Sidebar."""
+    self.tab6 = ttk.Frame(tabControl)
+    tabControl.add(self.tab6, text="Rezepte")
+    tab = 6
+    global tree, recipe, categorie, index, rec_cat
+
+    rec_frame_buttons = tk.Frame(self.tab6)
+    rec_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            rec_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    """Tab5 Treeview."""
+    tree = ttk.Treeview(self.tab6, columns=(config.recipe[1]))
+    column = 0
+    categorie = 0
+    recipe = 0
+
+    # Selektion Rückgabewert
+    def on_tree_select(self):
+        global selection_rec
+        for item in tree.selection():
+            selection_rec = tree.item(item, "text")
+            # print(selection_rec)
+
+    tree.bind("<<TreeviewSelect>>", on_tree_select)
+
+    # Sortierung durch Spalte
+    def treeview_sort_column(tv, col, reverse):
+        l = [(tree.set(k, col), k) for k in tree.get_children("")]
+        l.sort(reverse=reverse)
+
+        # rearrange items in sorted positions
+        for index, (val, k) in enumerate(l):
+            tree.move(k, "", index)
+
+        # reverse sort next time
+        tree.heading(
+            col, command=lambda _col=col: treeview_sort_column(tree, _col, not reverse),
         )
 
-        budget_out_label = tk.Label(budget_frame, text="Ausgaben: ").grid(
-            column=1, row=2
+    for col in config.recipe[1]:
+        tree.heading(
+            col,
+            text=col,
+            command=lambda _col=col: treeview_sort_column(tree, _col, False),
         )
-        budget_out_last = tk.Label(budget_frame, text="10,00€ (letzte: 5,00€)").grid(
-            column=2, row=2
+
+    # Erzeuge Scrollbar
+    scbTree = tk.Scrollbar(self.tab6, orient="vertical", command=tree.yview)
+    scbTree.pack(side="right", fill="y")
+    tree.configure(yscrollcommand=scbTree.set)
+
+    # Erzeugt Spalten
+    for col in config.recipe[1]:
+        tree.column(config.recipe[1][column], width=config.recipe[3][0])
+        tree.heading(config.recipe[1][column], text=config.recipe[2][column])
+        column += 1
+
+    # Erzeugt Kategorien
+    for cat in config.recipe[4]:
+        cat = tree.insert(
+            "",
+            config.recipe[4][categorie],
+            config.recipe[6][categorie],
+            text=config.recipe[5][categorie],
         )
+        rec = config.recipe[5][categorie]
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        cursor.execute(
+            "SELECT * FROM rec_recipe WHERE rec_categorie LIKE ?",
+            ("%" + str(rec)[2:-3] + "%",),
+        )
+        rec_cat = cursor.fetchall()
 
-        wood_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
-        wood_frame.pack(side="left", fill="y")
+        # Setzt vorhandene Rezepte in Kategorien ein
+        index = 0
+        for i in rec_cat:
+            tree.insert(
+                cat,
+                "end",
+                i + config.recipe[7][index],
+                text=rec_cat[index][2],
+                values=[rec_cat[index][6], rec_cat[index][7] or rec_cat[index][8]],
+            )
+            index += 1
+        cursor.close()
+        con.close()
+        recipe += 1
+        categorie += 1
 
-        wood_counter = tk.Label(wood_frame, text="Holz").grid(column=1, row=1)
-        wood_label = tk.Label(wood_frame, text="noch da").grid(column=2, row=2)
+    # cat_sub2 = tree.insert(
+    #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
+    # )
+
+    tree.pack(side="right", anchor="nw", fill="both", expand=True)
 
 
-Tab = Tabs()
+# ANCHOR Essensplan
+def meals(self):
+    """Tab6 Meal Sidebar."""
+    self.tab7 = ttk.Frame(tabControl)
+    tabControl.add(self.tab7, text="Essensplan")
+    tab = 7
+
+    meal_frame_buttons = tk.Frame(self.tab7)
+    meal_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            meal_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    """Tab6 Days."""
+    v = IntVar()
+    v.set(0)
+
+    day_frame = tk.Frame(self.tab7)
+    day_frame.pack(side="left", fill="both", expand=True)
+    Label1 = Label(
+        day_frame, text="Wochentag", bd=5, relief="sunken", font="Times 24 bold"
+    ).pack()
+
+    for txt in config.meal[1]:
+        Label(day_frame, text=txt, font="Times 24").pack(fill="y", expand=True)
+
+    """Tab6 Frame this week."""
+    this_week_frame = tk.Frame(self.tab7)
+    this_week_frame.pack(side="left", fill="y", expand=True)
+    Label2 = Label(
+        this_week_frame,
+        text="aktuelle Woche",
+        bd=5,
+        relief="sunken",
+        font="Times 24 bold",
+    ).pack()
+
+    for txt in config.meal[1]:
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        cursor.execute(
+            "SELECT name FROM rec_recipe WHERE week1 LIKE ?", (str(txt)[2:-3] + "%",),
+        )
+        test = cursor.fetchall()
+        cursor.close()
+        con.close()
+
+        Radiobutton(
+            this_week_frame,
+            text=str(test)[3:-4],
+            indicatoron=0,
+            width=16,
+            padx=10,
+            variable=v,
+            value=val,
+            font="Times 18",
+        ).pack(fill="y", expand=True)
+
+    """Tab6 Frame next week."""
+    next_week_frame = tk.Frame(self.tab7)
+    next_week_frame.pack(side="left", fill="y", expand=True)
+    Label3 = Label(
+        next_week_frame,
+        text="nächste Woche",
+        bd=5,
+        relief="sunken",
+        font="Times 24 bold",
+    ).pack()
+
+    for txt in config.meal[1]:
+        con = sqlite3.connect("family_data.db")
+        cursor = con.cursor()
+        cursor.execute(
+            "SELECT name FROM rec_recipe WHERE week2 LIKE ?", (str(txt)[2:-3] + "%",),
+        )
+        test = cursor.fetchall()
+        cursor.close()
+        con.close()
+
+        Radiobutton(
+            next_week_frame,
+            text=str(test)[3:-4],
+            indicatoron=0,
+            width=16,
+            padx=10,
+            variable=v,
+            value=val,
+            font="Times 18",
+        ).pack(fill="y", expand=True)
+
+
+# ANCHOR Haushaltsbuch
+def household(self):
+    """Tab8 Household Sidebar."""
+    self.tab8 = ttk.Frame(tabControl)
+    tabControl.add(self.tab8, text="Hahabu")
+
+    tab = 8
+
+    home_frame_buttons = tk.Frame(self.tab8)
+    home_frame_buttons.pack(side="right", anchor="e", fill="y")
+
+    for txt, col, val in config.sidebar_buttons[tab]:
+        Button(
+            home_frame_buttons,
+            text=txt,
+            bg=col,
+            width=config.sidebar_buttons[0][0],
+            font=config.sidebar_buttons[0][1],
+            command=val,
+        ).pack(fill="y", expand=1)
+
+    budget_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
+    budget_frame.pack(side="top", fill="y")
+
+    budget_in_label = tk.Label(budget_frame, text="Einnahmen: ").grid(column=1, row=1)
+    budget_in_last = tk.Label(budget_frame, text="20,00€ (letzte: 10,00€)").grid(
+        column=2, row=1
+    )
+
+    budget_out_label = tk.Label(budget_frame, text="Ausgaben: ").grid(column=1, row=2)
+    budget_out_last = tk.Label(budget_frame, text="10,00€ (letzte: 5,00€)").grid(
+        column=2, row=2
+    )
+
+    wood_frame = tk.Frame(self.tab8, bd=5, relief="sunken")
+    wood_frame.pack(side="left", fill="y")
+
+    wood_counter = tk.Label(wood_frame, text="Holz").grid(column=1, row=1)
+    wood_label = tk.Label(wood_frame, text="noch da").grid(column=2, row=2)
+
 
 # SECTION Fenster
 def top_window(args):
-    global refresh
     """Create Toplevel Windows."""
     # SECTION Overview
     if args >= 1 and args < 7:
@@ -1240,7 +1179,7 @@ def top_window(args):
                 recipe_view, text="Schließen", command=recipe_view.destroy
             )
             buClose.place(x=420, y=445)
-        # ANCHOR zum Essensplan hinzufügen
+        # TODO zum Essensplan hinzufügen
         elif args == 32:
             """zu Essensplan."""
             # Fenster erzeugen
@@ -1251,59 +1190,87 @@ def top_window(args):
             def insert_weekday():
                 week_day = d.get()
                 week = w.get()
-                try:
-                    if week == 1:
-                        con = sqlite3.connect("family_data.db")
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "UPDATE rec_recipe SET week1 = ? WHERE name = ?",
-                            (week_day + str(" (1)"), selection_rec,),
-                        )
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "SELECT * FROM rec_recipe WHERE name = ?", (selection_rec,),
-                        )
-                        selection = cursor.fetchall()
-                        index = selection[0][0]
-                        cat = selection[0][1]
-                        name = selection[0][2]
-                        time = selection[0][6]
-                        week1 = selection[0][7]
-                        selection_list = [cat, name, time, week1]
-                        print("Selektion:", selection)
-                        print("Index:", index)
-
-                        con.commit()
-                        cursor.close()
-                        con.close()
-                    elif week == 2:
-                        con = sqlite3.connect("family_data.db")
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "UPDATE rec_recipe SET week2 = ? WHERE name = ?",
-                            (week_day + str(" (2)"), selection_rec,),
-                        )
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "SELECT * FROM rec_recipe WHERE name = ?", (selection_rec,),
-                        )
-                        selection = cursor.fetchall()
-                        cat = selection[0][1]
-                        name = selection[0][2]
-                        time = selection[0][6]
-                        week2 = selection[0][8]
-                        selection_list = [cat, name, time, week2]
-
-                        con.commit()
-                        cursor.close()
-                        con.close()
-                except NameError:
-                    tk.messagebox.showinfo(
-                        title="Hinzufügen nicht möglich",
-                        message="Wähle ein Rezept zum Hinzufügen aus!",
+                if week == 1:
+                    con = sqlite3.connect("family_data.db")
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "UPDATE rec_recipe SET week1 = ? WHERE name = ?",
+                        (week_day + str(" (1)"), selection_rec,),
                     )
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "SELECT * FROM rec_recipe WHERE name = ?", (selection_rec,),
+                    )
+                    selection = cursor.fetchall()
+                    cat = selection[0][1]
+                    name = selection[0][2]
+                    time = selection[0][6]
+                    week1 = selection[0][7]
+                    selection_list = [cat, name, time, week1]
+
+                    # Kategorie zum Einsetzen in Treeview auslesen
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "SELECT dir FROM rec_cat WHERE categorie LIKE ?",
+                        (selection_list[0],),
+                    )
+                    cat_dir = cursor.fetchone()
+                    cursor.close()
+
+                    # Ausgewähltes Rezept aus Tree löschen
+                    selected_items = tree.selection()
+                    for selected_item in selected_items:
+                        tree.delete(selected_item)
+
+                    # Rezept dynamisch in Treeview einfügen
+                    tree.insert(
+                        cat_dir, "end", text=name, values=[time, week1],
+                    )
+                    print(selection_list)
+                    print(cat_dir)
+                    con.commit()
+                    cursor.close()
+                    con.close()
+                elif week == 2:
+                    con = sqlite3.connect("family_data.db")
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "UPDATE rec_recipe SET week2 = ? WHERE name = ?",
+                        (week_day + str(" (2)"), selection_rec,),
+                    )
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "SELECT * FROM rec_recipe WHERE name = ?", (selection_rec,),
+                    )
+                    selection = cursor.fetchall()
+                    cat = selection[0][1]
+                    name = selection[0][2]
+                    time = selection[0][6]
+                    week2 = selection[0][8]
+                    selection_list = [cat, name, time, week2]
+
+                    # Kategorie zum Einsetzen in Treeview auslesen
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "SELECT dir FROM rec_cat WHERE categorie LIKE ?",
+                        ("%" + selection_list[0] + "%",),
+                    )
+                    cat_dir = cursor.fetchone()
+                    cursor.close()
+
+                    # Ausgewähltes Rezept aus Tree löschen
+                    selected_items = tree.selection()
+                    for selected_item in selected_items:
+                        tree.delete(selected_item)
+
+                    # Rezept dynamisch in Treeview einfügen
+                    tree.insert(
+                        cat_dir, "end", text=name, values=[time, week2],
+                    )
+                    con.commit()
+                    cursor.close()
+                    con.close()
                 recipe_add.destroy()
-                refresh()
 
             # # Auswahl Woche
             w = IntVar()
@@ -1326,11 +1293,7 @@ def top_window(args):
                     width=20,
                     padx=20,
                     variable=d,
-                    command=lambda: [
-                        insert_weekday(),
-                        identities_reset(),
-                        partial(change, n),
-                    ],
+                    command=insert_weekday,
                     value=str(config.meal[1][n])[2:-3],
                 ).grid(column=1, columnspan=2)
         # ANCHOR neue Kategorie
@@ -1346,22 +1309,16 @@ def top_window(args):
 
             # neue Kategorie in Datenbank schreiben
             def commit():
-                # global Dir
+                global Dir
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
                 cursor.execute("SELECT max(id_categorie) FROM rec_cat")
                 max_id = cursor.fetchone()[-1]
                 new_categorie = cat_new.get()
-                try:
-                    iD = int(max_id) + 1
-                    Dir = "dir" + str((max_id + 2))
-                    Sub1 = "dir " + str((max_id + 2))
-                    Sub2 = "dir  " + str((max_id + 2))
-                except TypeError:
-                    iD = 1
-                    Dir = "dir2"
-                    Sub1 = "dir 2"
-                    Sub2 = "dir  2"
+                iD = int(max_id) + 1
+                Dir = "dir" + str((max_id + 2))
+                Sub1 = "dir " + str((max_id + 2))
+                Sub2 = "dir  " + str((max_id + 2))
                 cursor.execute(
                     "INSERT INTO rec_cat(id_categorie, categorie, dir, sub1, sub2) VALUES(?, ?, ?, ?, ?)",
                     (iD, new_categorie, Dir, Sub1, Sub2),
@@ -1372,8 +1329,8 @@ def top_window(args):
                 categorie_new.destroy()
 
             # neue Kategorie dynamisch in Tree einfügen
-            # def refresh():
-            #     tree.insert("", "end", Dir, text=cat_new.get())
+            def refresh():
+                tree.insert("", "end", Dir, text=cat_new.get())
 
             # bei Bestätigung mit Enter
             def entry_return(event):
@@ -1420,10 +1377,7 @@ def top_window(args):
                 cursor = con.cursor()
                 cursor.execute("SELECT max(id_recipe) FROM rec_recipe")
                 max_id = cursor.fetchone()[-1]
-                try:
-                    index = int(max_id) + 1
-                except TypeError:
-                    index = 1
+                index = int(max_id) + 1
                 name = Name.get()
                 cat = Categorie.get()
                 catList = []
@@ -1463,10 +1417,9 @@ def top_window(args):
                 cursor.close()
                 con.close()
 
-                # # Rezept dynamisch in Treeview einfügen
-                # tree.insert(cat_dir, "end", text=Name.get(), values=[Time.get()])
+                # Rezept dynamisch in Treeview einfügen
+                tree.insert(cat_dir, "end", text=Name.get(), values=[Time.get()])
                 recipe_new.destroy()
-                refresh()
 
             # Scrollbarverknüpfung Zutaten und Mengen
             def multi_scrollbar(*args):
@@ -1555,7 +1508,7 @@ def top_window(args):
                 recipe_new, text="Schließen", command=recipe_new.destroy
             )
             buClose.place(x=420, y=445)
-        # ANCHOR Rezept ändern
+        # TODO Rezept ändern
         elif args == 35:
             """Rezept ändern."""
             global meal_day, Meal
@@ -1607,7 +1560,29 @@ def top_window(args):
                 con.commit()
                 cursor.close()
 
-                refresh()
+                # Kategorie zum Einsetzen in Treeview auslesen
+                cursor = con.cursor()
+                cursor.execute(
+                    "SELECT dir FROM rec_cat WHERE categorie LIKE ?",
+                    ("%" + str(catList[0][2:-3]) + "%",),
+                )
+                cat_dir = cursor.fetchone()
+                cursor.close()
+                con.close()
+
+                # Ausgewähltes Rezept aus Tree löschen
+                selected_items = tree.selection()
+                for selected_item in selected_items:
+                    tree.delete(selected_item)
+
+                # Rezept dynamisch in Treeview einfügen
+                tree.insert(
+                    cat_dir,
+                    "end",
+                    text=Name.get(),
+                    values=[Time.get(), meal_day[0]],
+                    # values=[Time.get(), str(Meal.get())[2:-3]],
+                )
                 recipe_edit.destroy()
 
             # Kategorie auslesen
@@ -1838,7 +1813,10 @@ def top_window(args):
                     cursor.close()
                     con.close()
 
-                    refresh()
+                    # Ausgewähltes Rezept aus Tree löschen
+                    selected_items = tree.selection()
+                    for selected_item in selected_items:
+                        tree.delete(selected_item)
             except NameError:
                 tk.messagebox.showinfo(
                     title="Löschen nicht möglich",
@@ -1846,499 +1824,83 @@ def top_window(args):
                 )
     # SECTION Meal
     elif args >= 37 and args < 43:
-        # ANCHOR Essen hinzufügen
+        # TODO Essen hinzufügen
         if args == 37:
             """Essen hinzufügen."""
             meal_add = Toplevel()
             meal_add.title(config.sidebar_buttons[7][0][0])
-            meal_add.geometry("+%d+%d" % (250, 50))
-            meal_add["height"] = 480
-            meal_add["width"] = 600
-
-            try:
-                if bname != "":
-                    tk.messagebox.showinfo(
-                        title="Essen vorhanden",
-                        message="Wochentag hat bereits ein Essen!",
-                    )
-                else:
-                    tree = ttk.Treeview(meal_add, show="tree")
-                    tree.column("#0", width=600)
-                    categorie = 0
-                    recipe = 0
-
-                    def meal_replace():
-                        del button_identities[bcount1[0]]
-                        button_identities.insert(bcount1[0], selection_meal)
-
-                        con = sqlite3.connect("family_data.db")
-                        if bcount1[0] < 7:
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT day FROM meal_days WHERE w1 == ?",
-                                (str(bcount1[0]),),
-                            )
-                            day = cursor.fetchall()
-                            cursor.close()
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week1 = ? WHERE name = ?",
-                                (str(day)[3:-4] + " (1)", selection_meal,),
-                            )
-                            con.commit()
-                            cursor.close()
-                            con.close()
-                        else:
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT day FROM meal_days WHERE w2 == ?",
-                                (bcount1[0],),
-                            )
-                            day = cursor.fetchall()
-                            cursor.close()
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week2 = ? WHERE name = ?",
-                                (str(day)[3:-4] + " (2)", selection_meal,),
-                            )
-                            con.commit()
-                            cursor.close()
-                            con.close()
-
-                    # Selektion Rückgabewert
-                    def on_tree_select(self):
-                        global selection_meal
-                        for item in tree.selection():
-                            selection_meal = tree.item(item, "text")
-                            print(selection_meal)
-
-                    tree.bind("<<TreeviewSelect>>", on_tree_select)
-
-                    # Erzeuge Scrollbar
-                    scbTree = tk.Scrollbar(
-                        meal_add, orient="vertical", command=tree.yview
-                    )
-                    scbTree.pack(side="right", fill="y")
-                    tree.configure(yscrollcommand=scbTree.set)
-
-                    # Erzeugt Kategorien
-                    for cat in config.recipe[4]:
-                        rec = config.recipe[5][categorie]
-                        con = sqlite3.connect("family_data.db")
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "SELECT * FROM rec_recipe WHERE rec_categorie LIKE ?",
-                            ("%" + str(rec)[2:-3] + "%",),
-                        )
-                        rec_cat = cursor.fetchall()
-                        cat = tree.insert(
-                            "",
-                            config.recipe[4][categorie],
-                            config.recipe[6][categorie],
-                            text=config.recipe[5][categorie],
-                        )
-                        cursor.close()
-                        con.close()
-
-                        # Setzt vorhandene Rezepte in Kategorien ein
-                        index_add = -1
-                        for i in rec_cat:
-                            index_add += 1
-                            tree.insert(
-                                cat,
-                                "end",
-                                i + config.recipe[7][index_add],
-                                text=rec_cat[index_add][2],
-                                values=[
-                                    # rec_cat[index][6],
-                                    rec_cat[index_add][7]
-                                    or rec_cat[index_add][8],
-                                ],
-                            )
-                        recipe += 1
-                        categorie += 1
-
-                    # cat_sub2 = tree.insert(
-                    #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
-                    # )
-
-                    tree.pack(fill="both", expand=True)
-            except NameError:
-                tk.messagebox.showinfo(
-                    title="Hinzufügen nicht möglich",
-                    message="Wähle einen Wochentag zum Hinzufügen aus!",
-                )
-
-            # Buttons erzeugen
-            buPrint = tk.Button(
-                meal_add,
-                text="OK",
-                command=lambda: [meal_replace(), refresh(), meal_add.destroy(),],
+            meal_add.geometry("+%d+%d" % (400, 200))
+            meal_add_label1 = tk.Label(meal_add, text="Rezept:").grid(column=1, row=1)
+            meal_add_label2 = tk.Label(meal_add, text="Zutaten:").grid(column=1, row=2)
+            meal_add_label3 = tk.Label(meal_add, text="Anleitung:").grid(
+                column=1, row=3
             )
-            buPrint.place(x=220, y=445)
 
-            buClose = tk.Button(meal_add, text="Schließen", command=meal_add.destroy)
-            buClose.place(x=420, y=445)
-        # ANCHOR Essen ändern
+            meal_add_entry1 = tk.Entry(meal_add).grid(column=2, row=1)
+            meal_add_entry2 = tk.Entry(meal_add).grid(column=2, row=2)
+            meal_add_entry3 = tk.Entry(meal_add).grid(column=2, row=3)
+
+            meal_add_button1 = tk.Button(meal_add, text="OK").grid(column=1, row=4)
+            meal_add_button2 = tk.Button(
+                meal_add, text="Abbrechen", command=self.Tabs.meals
+            ).grid(column=2, row=4)
+        # TODO Essen ändern
         elif args == 38:
             """Essen ändern."""
             meal_edit = Toplevel()
             meal_edit.title(config.sidebar_buttons[7][1][0])
-            meal_edit.geometry("+%d+%d" % (250, 50))
-            meal_edit["height"] = 480
-            meal_edit["width"] = 600
+            meal_edit.geometry("+%d+%d" % (400, 200))
 
-            try:
-                if bname == "":
-                    tk.messagebox.showinfo(
-                        title="Kein Essen",
-                        message="Kein Essen für diesen Wochentag zugewiesen!",
-                    )
-                else:
-                    tree = ttk.Treeview(meal_edit, show="tree")
-                    tree.column("#0", width=600)
-                    categorie = 0
-                    recipe = 0
+            v = IntVar()
+            v.set(1)
+            val = 0
+            valList = []
 
-                    def meal_change():
-                        del button_identities[bcount1[0]]
-                        button_identities.insert(bcount1[0], selection_meal)
+            Label(
+                meal_edit, text="Wähle einen Wochentag:", justify=LEFT, padx=20,
+            ).pack()
 
-                        con = sqlite3.connect("family_data.db")
-                        if bcount1[0] < 7:
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT day FROM meal_days WHERE w1 == ?",
-                                (str(bcount1[0]),),
-                            )
-                            day = str(cursor.fetchall())[3:-4]
-                            cursor.close()
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT name FROM rec_recipe WHERE week1 == ?",
-                                (day + " (1)",),
-                            )
-                            recipe = str(cursor.fetchone())[2:-3]
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week1 = ? WHERE name = ?",
-                                ("", recipe,),
-                            )
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week1 = ? WHERE name = ?",
-                                (day + " (1)", selection_meal,),
-                            )
-                            con.commit()
-                            cursor.close()
-                            con.close()
-                        else:
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT day FROM meal_days WHERE w2 == ?",
-                                (str(bcount1[0]),),
-                            )
-                            day = str(cursor.fetchall())[3:-4]
-                            cursor.close()
-                            cursor = con.cursor()
-                            cursor.execute(
-                                "SELECT name FROM rec_recipe WHERE week2 == ?",
-                                (day + " (2)",),
-                            )
-                            recipe = str(cursor.fetchone())[2:-3]
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week2 = ? WHERE name = ?",
-                                ("", recipe,),
-                            )
-                            cursor.execute(
-                                "UPDATE rec_recipe SET week2 = ? WHERE name = ?",
-                                (day + " (2)", selection_meal,),
-                            )
-                            con.commit()
-                            cursor.close()
-                            con.close()
-
-                    # Selektion Rückgabewert
-                    def on_tree_select(self):
-                        global selection_meal
-                        for item in tree.selection():
-                            selection_meal = tree.item(item, "text")
-                            print(selection_meal)
-
-                    tree.bind("<<TreeviewSelect>>", on_tree_select)
-
-                    # Erzeuge Scrollbar
-                    scbTree = tk.Scrollbar(
-                        meal_edit, orient="vertical", command=tree.yview
-                    )
-                    scbTree.pack(side="right", fill="y")
-                    tree.configure(yscrollcommand=scbTree.set)
-
-                    # Erzeugt Kategorien
-                    for cat in config.recipe[4]:
-                        rec = config.recipe[5][categorie]
-                        con = sqlite3.connect("family_data.db")
-                        cursor = con.cursor()
-                        cursor.execute(
-                            "SELECT * FROM rec_recipe WHERE rec_categorie LIKE ?",
-                            ("%" + str(rec)[2:-3] + "%",),
-                        )
-                        rec_cat = cursor.fetchall()
-                        cat = tree.insert(
-                            "",
-                            config.recipe[4][categorie],
-                            config.recipe[6][categorie],
-                            text=config.recipe[5][categorie],
-                        )
-                        cursor.close()
-                        con.close()
-
-                        # Setzt vorhandene Rezepte in Kategorien ein
-                        index_add = -1
-                        for i in rec_cat:
-                            index_add += 1
-                            tree.insert(
-                                cat,
-                                "end",
-                                i + config.recipe[7][index_add],
-                                text=rec_cat[index_add][2],
-                                values=[
-                                    # rec_cat[index][6],
-                                    rec_cat[index_add][7]
-                                    or rec_cat[index_add][8],
-                                ],
-                            )
-                        recipe += 1
-                        categorie += 1
-
-                    # cat_sub2 = tree.insert(
-                    #     cat_sub1, "end", config.recipe[8][recipe], text=config.recipe[12],
-                    # )
-
-                    tree.pack(fill="both", expand=True)
-            except NameError:
-                tk.messagebox.showinfo(
-                    title="Ändern nicht möglich",
-                    message="Wähle einen Wochentag zum Ändern aus!",
-                )
-
-            # Buttons erzeugen
-            buPrint = tk.Button(
-                meal_edit,
-                text="OK",
-                command=lambda: [meal_change(), refresh(), meal_edit.destroy(),],
-            )
-            buPrint.place(x=220, y=445)
-
-            buClose = tk.Button(meal_edit, text="Schließen", command=meal_edit.destroy)
-            buClose.place(x=420, y=445)
-        # ANCHOR Rezept anzeigen
+            for txt in config.meal[1]:
+                val += 1
+                valList.append(val)
+                print(val, valList)
+                Radiobutton(
+                    meal_edit,
+                    text=txt,
+                    indicatoron=0,
+                    width=20,
+                    padx=20,
+                    variable=v,
+                    value=val,
+                    command=lambda: [print(val), meal_edit.destroy,],
+                ).pack(anchor=W)
+        # TODO Rezept anzeigen
         elif args == 39:
             """?."""
             meal_del = Toplevel()
             meal_del.title(config.sidebar_buttons[7][2][0])
-            meal_del.geometry("+%d+%d" % (250, 50))
-            meal_del["height"] = 480
-            meal_del["width"] = 600
-
-            # Kategorie auslesen
-            def categorie():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT rec_categorie FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txCategorie.insert("end", dsatz[0])
-                    txCategorie.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Dauer auslesen
-            def time():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT time FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txTime.insert("end", dsatz[0])
-                    txTime.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Name auslesen
-            def name():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT name FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txName.insert("end", dsatz[0])
-                    txName.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Zutaten auslesen
-            def ingredient():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT ingredient FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txIngredient.insert("end", dsatz[0])
-                    txIngredient.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Mengen auslesen
-            def measurement():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT measurement FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txMeasurement.insert("end", dsatz[0])
-                    txMeasurement.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Anleitung auslesen
-            def recipe():
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "SELECT recipe FROM rec_recipe WHERE name = ?", (bname,),
-                )
-                for dsatz in cursor:
-                    txRecipe.insert("end", dsatz[0])
-                    txRecipe.config(state="disabled")
-                cursor.close()
-                con.close()
-
-            # Scrollbarverknüpfung Zutaten und Mengen
-            def multi_scrollbar(*args):
-                txMeasurement.yview(*args)
-                txMeasurement.configure(yscrollcommand=scbMeasurement.set)
-                txIngredient.yview(*args)
-                txIngredient.configure(yscrollcommand=scbIngredient.set)
-
-            # Anzeige Rezept
-            lbName = tk.Label(meal_del, text="Rezept:")
-            lbName.place(x=10, y=10)
-            txName = tk.Text(meal_del, width=60, height=1)
-            txName.place(x=90, y=10)
-
-            # Anzeige Kategorie
-            lbCategorie = tk.Label(meal_del, text="Kategorie:")
-            lbCategorie.place(x=10, y=40)
-            txCategorie = tk.Text(meal_del, width=15, height=1)
-            txCategorie.place(x=90, y=40)
-
-            # Anzeige Dauer
-            lbTime = tk.Label(meal_del, text="Dauer:")
-            lbTime.place(x=220, y=40)
-            txTime = tk.Text(meal_del, width=15, height=1)
-            txTime.place(x=270, y=40)
-
-            # Anzeige und Scrollbar Zutaten
-            lbIngredient = tk.Label(meal_del, text="Zutaten:")
-            lbIngredient.place(x=10, y=70)
-            frIngredient = tk.Frame(meal_del)
-            frIngredient.place(x=90, y=70)
-            scbIngredient = tk.Scrollbar(
-                frIngredient, orient="vertical", command=multi_scrollbar
+            meal_del.geometry("+%d+%d" % (400, 200))
+            meal_del_label = tk.Label(meal_del, text="Neue Kategorie:").grid(
+                column=1, row=1
             )
-            txIngredient = tk.Text(frIngredient, width=36, height=8)
-            txIngredient.pack(side="left")
-            scbIngredient.pack(side="left", fill="y")
-
-            # Anzeige und Scrollbar Mengen
-            lbMeasurement = tk.Label(meal_del, text="Menge:")
-            lbMeasurement.place(x=410, y=70)
-            frMeasurement = tk.Frame(meal_del)
-            frMeasurement.place(x=475, y=70)
-            scbMeasurement = tk.Scrollbar(
-                frMeasurement, orient="vertical", command=multi_scrollbar
-            )
-            txMeasurement = tk.Text(frMeasurement, width=10, height=8)
-            txMeasurement.pack(side="left")
-            scbMeasurement.pack(side="left", fill="y")
-
-            # Anzeige und Scrollbar Anleitung
-            lbRecipe = tk.Label(meal_del, text="Anleitung:")
-            lbRecipe.place(x=10, y=230)
-            frRecipe = tk.Frame(meal_del)
-            frRecipe.place(x=90, y=230)
-            scbRecipe = tk.Scrollbar(frRecipe, orient="vertical")
-            txRecipe = tk.Text(
-                frRecipe, width=58, height=12, yscrollcommand=scbRecipe.set
-            )
-            scbRecipe["command"] = txRecipe.yview
-            txRecipe.pack(side="left")
-            scbRecipe.pack(side="left", fill="y")
-
-            # Rückgabewerte automatisch anzeigen
-            try:
-                if bname == "":
-                    tk.messagebox.showinfo(
-                        title="Anzeigen nicht möglich",
-                        message="Kein Essen für diesen Tag gewählt!",
-                    )
-                else:
-                    categorie()
-                    time()
-                    name()
-                    ingredient()
-                    measurement()
-                    recipe()
-            except NameError:
-                tk.messagebox.showinfo(
-                    title="Anzeigen nicht möglich",
-                    message="Wähle einen Wochentag zum Anzeigen aus!",
-                )
-
-            # Buttons erzeugen
-            buPrint = tk.Button(meal_del, text="Drucken",)
-            buPrint.place(x=220, y=445)
-
-            buClose = tk.Button(meal_del, text="Schließen", command=meal_del.destroy)
-            buClose.place(x=420, y=445)
-        # ANCHOR Essen löschen
+            meal_del_entry = tk.Entry(meal_del).grid(column=2, row=1)
+            meal_del_button1 = tk.Button(meal_del, text="OK").grid(column=1, row=2)
+            meal_del_button2 = tk.Button(
+                meal_del, text="Abbrechen", command=meal_del.destroy
+            ).grid(column=2, row=2)
+        # TODO Essen löschen
         elif args == 40:
             """Einzelnen Tag löschen."""
             day_del = tk.messagebox.askquestion(
                 config.sidebar_buttons[7][3][0],
-                "Möchtest du das Essen wirklich löschen?",
+                "Möchtest du einen Tag wirklich löschen?",
                 icon="warning",
             )
             if day_del == "yes":
-                try:
-                    con = sqlite3.connect("family_data.db")
-                    cursor = con.cursor()
-                    print(bname)
-                    cursor.execute(
-                        "UPDATE rec_recipe SET week1 = ? WHERE name = ?", ("", bname,)
-                    )
-                    cursor.execute(
-                        "UPDATE rec_recipe SET week2 = ? WHERE name = ?", ("", bname,)
-                    )
-                    con.commit()
-                    print("Bname:", bname)
-                    print("Essen gelöscht")
-                    cursor.close()
-                    con.close()
-                    identities_reset()
-                    refresh()
-                except NameError:
-                    tk.messagebox.showinfo(
-                        title="Löschen nicht möglich",
-                        message="Wähle ein Rezept zum Löschen aus!",
-                    )
+                print("Ein Tag gelöscht")
             else:
                 print("Ein Tag nicht gelöscht")
-        # ANCHOR Woche 1 löschen
+        # TODO Woche 1 löschen
         elif args == 41:
             """Woche 1 löschen."""
             week1_del = tk.messagebox.askquestion(
@@ -2346,20 +1908,11 @@ def top_window(args):
                 "Möchtest du Woche 1 wirklich löschen?",
                 icon="warning",
             )
-            # Woche 2 aus Datenbank löschen
             if week1_del == "yes":
-                con = sqlite3.connect("family_data.db")
-                cursor = con.cursor()
-                cursor.execute(
-                    "UPDATE rec_recipe SET week1 = ? WHERE week1 != ?", ("", "",)
-                )
-                con.commit()
                 print("Woche 1 gelöscht")
-                cursor.close()
-                con.close()
-                identities_reset()
-                refresh()
-        # ANCHOR Woche 2 löschen
+            else:
+                print("Woche 1 nicht gelöscht")
+        # TODO Woche 2 löschen
         elif args == 42:
             """Woche 2 löschen."""
             week2_del = tk.messagebox.askquestion(
@@ -2371,15 +1924,11 @@ def top_window(args):
             if week2_del == "yes":
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
-                cursor.execute(
-                    "UPDATE rec_recipe SET week2 = ? WHERE week2 != ?", ("", "",)
-                )
+                cursor.execute("DELETE FROM meal_days WHERE week2 IS NOT NULL")
                 con.commit()
-                print("Woche 2 gelöscht")
+                print("OK")
                 cursor.close()
                 con.close()
-                identities_reset()
-                refresh()
     # SECTION Household
     elif args >= 43 and args < 49:
         if args == 43:
@@ -2493,20 +2042,8 @@ def fullscreen_toggle(self):
         self.attributes("-fullscreen", FALSE)
 
 
-def refresh():
-    importlib.reload(config)
-    identities_reset()
-
-    # Rezepte
-    tree.destroy()
-    scbTree.destroy()
-    recipes_tree()
-
-    # Essensplan
-    this_week_frame.destroy()
-    next_week_frame.destroy()
-    this_week()
-    next_week()
-
-    # Rückmeldung
-    print("Refresh")
+def refresh(event):
+    # Tabs.meals()
+    # tabControl.update()
+    cards()
+    print("refresh")

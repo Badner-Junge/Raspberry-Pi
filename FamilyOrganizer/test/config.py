@@ -368,6 +368,49 @@ def meal():
         day_meal_list.append(day_day)
     cursor.close()
 
+    # week_day = [
+    #     [
+    #         ("Montag", 1),
+    #         ("Dienstag", 2),
+    #         ("Mittwoch", 3),
+    #         ("Donnerstag", 4),
+    #         ("Freitag", 5),
+    #         ("Samstag", 6),
+    #         ("Sonntag", 7),
+    #     ],
+    #     [
+    #         ("Montag"),
+    #         ("Dienstag"),
+    #         ("Mittwoch"),
+    #         ("Donnerstag"),
+    #         ("Freitag"),
+    #         ("Samstag"),
+    #         ("Sonntag"),
+    #     ],
+    # ]
+
+    # meal_week = [
+    #     [
+    #         ("Essen1", 1),
+    #         ("Essen2", 2),
+    #         ("Essen3", 3),
+    #         ("Essen4", 4),
+    #         ("Essen5", 5),
+    #         ("Essen6", 6),
+    #         ("Essen7", 7),
+    #     ],
+    #     [
+    #         ("Essen8", 8),
+    #         ("Essen9", 9),
+    #         ("Essen10", 10),
+    #         ("Essen11", 11),
+    #         ("Essen12", 12),
+    #         ("Essen13", 13),
+    #         ("Essen14", 14),
+    #     ],
+    # ]
+
+    # return week_day, meal_week, id_meal_list, day_meal_list
     return id_meal_list, day_meal_list
 
 

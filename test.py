@@ -226,31 +226,69 @@ if os.environ.get("DISPLAY", "") == "":
 # plt.show()
 
 
+# root = Tk()
+
+# root.geometry("480x540+100+100")
+# root.config(cursor="")
+
+# line = Text(root, bg="light grey", font="Roman 24", width=4)
+# line.pack(side=LEFT, fill=BOTH)
+
+# text = Text(root, bg="grey", font="Roman 24")
+# text.pack(side=LEFT, fill=BOTH, expand=True)
+
+
+# def multiple_yview(*args):
+#     line.yview(*args)
+#     text.yview(*args)
+
+
+# scrollbar = Scrollbar(text, orient=VERTICAL, command=multiple_yview)
+# text.configure(yscrollcommand=scrollbar.set)
+# line.configure(yscrollcommand=scrollbar.set)
+# scrollbar.pack(side=RIGHT, fill=Y)
+
+# for n in range(50):
+#     line.insert("{}.0".format(n + 1), "{}\n".format(n + 1))
+#     text.insert("{}.0".format(n + 1), "Line no. {}\n".format(n + 1))
+
+# if __name__ == "__main__":
+#     root.mainloop()
+
+"""Sorting by click columns"""
 root = Tk()
 
 root.geometry("480x540+100+100")
 root.config(cursor="")
 
-line = Text(root, bg="light grey", font="Roman 24", width=4)
-line.pack(side=LEFT, fill=BOTH)
+columns = ("Student", "Course", "Last Session")
 
-text = Text(root, bg="grey", font="Roman 24")
-text.pack(side=LEFT, fill=BOTH, expand=True)
+tv = ttk.Treeview(root, show="headings", columns=columns, height=25)
 
 
-def multiple_yview(*args):
-    line.yview(*args)
-    text.yview(*args)
+def treeview_sort_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children("")]
+    l.sort(reverse=reverse)
+
+    # rearrange items in sorted positions
+    for index, (val, k) in enumerate(l):
+        tv.move(k, "", index)
+
+    # reverse sort next time
+    tv.heading(
+        col, command=lambda _col=col: treeview_sort_column(tv, _col, not reverse)
+    )
 
 
-scrollbar = Scrollbar(text, orient=VERTICAL, command=multiple_yview)
-text.configure(yscrollcommand=scrollbar.set)
-line.configure(yscrollcommand=scrollbar.set)
-scrollbar.pack(side=RIGHT, fill=Y)
+for col in columns:
+    tv.heading(
+        col, text=col, command=lambda _col=col: treeview_sort_column(tv, _col, False)
+    )
+tv.pack()
 
-for n in range(50):
-    line.insert("{}.0".format(n + 1), "{}\n".format(n + 1))
-    text.insert("{}.0".format(n + 1), "Line no. {}\n".format(n + 1))
+tv.insert("", "end", "dir", text="Test", values=["TTT", "111"])
+tv.insert("", "end", "dir1", text="Test", values=["DDD", "666"])
+tv.insert("", "end", "dir2", text="Test", values=["CCC", "999"])
+tv.insert("", "end", "dir3", text="Test", values=["AAA", "333"])
 
-if __name__ == "__main__":
-    root.mainloop()
+root.mainloop()

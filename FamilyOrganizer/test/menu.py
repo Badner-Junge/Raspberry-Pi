@@ -8,9 +8,9 @@ Geschrieben von: Fabian Rieger
 
 from tkinter import *
 from tkinter import ttk
-from test_config import *
-from test_modules import *
-import test_modules, test_config, tkinter.messagebox
+from config import *
+from modules import *
+import modules, config, tkinter.messagebox
 import tkinter as tk
 
 
@@ -26,10 +26,11 @@ class menuBar:
         menubar.add_cascade(label="Datei", menu=file_menu)
         file_menu.add_command(label="Beenden", command=self.end)
 
-        visual_menu = Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Darstellung", menu=visual_menu)
-        visual_menu.add_command(label="Vollbild", command=self.fullscreen_toggle)
-        # visual_menu.add_command(label="Vollbild", command=self.fullscreen_toggle)
+        option_menu = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Optionen", menu=option_menu)
+        option_menu.add_command(label="Vollbild", command=self.fullscreen_toggle)
+        option_menu.add_command(label="Lüftersteuerung")
+        option_menu.add_command(label="Refresh")
 
         help_menu = Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=help_menu)

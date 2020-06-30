@@ -9,10 +9,12 @@ Geschrieben von: Fabian Rieger
 
 from tkinter import *
 from tkinter import ttk
-from test_menu import *
-from test_modules import *
-from test_config import *
-import test_menu, test_modules, test_config, os, tkinter.messagebox
+from menu import *
+from modules import *
+
+# from modules import tabControl
+from config import *
+import menu, modules, config, os, tkinter.messagebox
 import tkinter as tk
 
 if os.environ.get("DISPLAY", "") == "":
@@ -29,15 +31,14 @@ class Root(Tk):
         self.title("Family Organizer")
         self.attributes("-fullscreen", TRUE)
         self.minsize(512, 265)
-        # self.configure(background="white")
 
-        test_menu.menuBar.createMenu(self)
-        test_modules.Tabs.cards(self)
-        test_config.style()
+        menu.menuBar.createMenu(self)
+        modules.cards(self)
+        config.style()
 
     def fullscreen_toggle(self):
         """Fullscreen from menu.py."""
-        test_modules.fullscreen_toggle(self)
+        modules.fullscreen_toggle(self)
 
     def end(self):
         """Close Main Window."""
@@ -46,3 +47,4 @@ class Root(Tk):
 
 root = Root()
 root.mainloop()
+
