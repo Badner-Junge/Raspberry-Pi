@@ -13,7 +13,8 @@ from config import *
 from functools import partial
 import config, datetime, tkcalendar, tkinter.messagebox, time, sys, threading, sqlite3
 import tkinter as tk
-import RPi.GPIO as GPIO
+
+# import RPi.GPIO as GPIO
 import importlib
 
 # SECTION Tabs
@@ -204,6 +205,7 @@ class Tabs:
     # ANCHOR Einkaufen
     def shopping(self):
         """Tab5 Shopping Sidebar."""
+        global shopping_tree, shop_list
         tab = 5
 
         shop_frame_buttons = tk.Frame(self.tab5)
@@ -220,27 +222,153 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 Listbox."""
-        Listbox(self.tab5).pack(side="right", fill="both", expand=True)
+
+        # def shopping_list():
+        #     global shop_list
+        shop_list = tk.Listbox(self.tab5)
+        shop_list.pack(side="right", fill="both", expand=True)
 
         """Tab5 Treeview."""
-        shop_tree = ttk.Treeview(self.tab5)
 
-        cat1 = shop_tree.insert("", 1, "dir2", text=config.shop[-1][0])
-        shop_tree.insert(
-            cat1, "end", "dir 2", text=config.shop[0][2], values=(config.shop[0][3])
-        )
+        def shopping_tree():
+            global shop_tree, scbTreeShop
+            shop_tree = ttk.Treeview(self.tab5, show="tree", columns=("Test"))
+            shop_tree.column("Test", width=10)
+            shop_tree.heading("Test", text="Test")
+            # column = 0
+            categorie = 0
+            recipe = 0
 
-        cat2 = shop_tree.insert("", 2, "dir3", text=config.shop[-1][1])
-        shop_tree.insert(
-            cat2, "end", "dir 3", text=config.shop[1][2], values=(config.shop[1][3])
-        )
+            def on_tree_select_shop(self):
+                global selection_shop
+                for item in shop_tree.selection():
+                    selection_shop = shop_tree.item(item, "text")
+                # print(selection_shop)
 
-        cat3 = shop_tree.insert("", 3, "dir4", text=config.shop[-1][2])
-        shop_tree.insert(
-            cat3, "end", "dir 4", text=config.shop[2][2], values=(config.shop[2][3])
-        )
+            shop_tree.bind("<<TreeviewSelect>>", on_tree_select_shop)
 
-        shop_tree.pack(side="right", anchor="nw", fill="both", expand=True)
+            # Erzeuge Scrollbar
+            scbTreeShop = tk.Scrollbar(
+                self.tab5, orient="vertical", command=shop_tree.yview
+            )
+            scbTreeShop.pack(side="right", fill="y")
+            shop_tree.configure(yscrollcommand=scbTreeShop.set)
+
+            # Erzeugt Kategorien
+            for cat in config.shop[0]:
+                shop = config.shop[1][categorie]
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+                cursor.execute(
+                    "SELECT * FROM shop_cat WHERE name_shop_cat LIKE ?",
+                    ("%" + str(shop)[2:-3] + "%",),
+                )
+                shop_cat = cursor.fetchall()
+
+                # Haupkategorie
+                if shop_cat[0][6] == "":
+                    cat = shop_tree.insert(
+                        "", "end", shop_cat[0][2], text=shop_cat[0][1],
+                    )
+                # Sub 1
+                else:
+                    con = sqlite3.connect("family_data.db")
+                    cursor = con.cursor()
+                    cursor.execute(
+                        "SELECT dir FROM shop_cat WHERE name_shop_cat LIKE ?",
+                        (shop_cat[0][6],),
+                    )
+                    shop_sub = str(cursor.fetchall())[3:-4]
+                    try:
+                        sub = shop_tree.insert(
+                            shop_sub, "end", shop_cat[0][3], text=shop_cat[0][1]
+                        )
+                    # Sub 2
+                    except:
+                        cursor.execute(
+                            "SELECT sub1 FROM shop_cat WHERE name_shop_cat LIKE ?",
+                            (shop_cat[0][6],),
+                        )
+                        shop_sub1 = str(cursor.fetchall())[3:-4]
+                        sub = shop_tree.insert(
+                            shop_sub1, "end", shop_cat[0][4], text=shop_cat[0][1]
+                        )
+                cursor.close()
+                con.close()
+
+                recipe += 1
+                categorie += 1
+
+            # Essensplan Rezepte einfügen
+            con = sqlite3.connect("family_data.db")
+            cursor = con.cursor()
+            cursor.execute("SELECT name FROM rec_recipe WHERE week1 != ''")
+            week1_list = cursor.fetchall()
+            cursor.execute("SELECT name FROM rec_recipe WHERE week2 != ''")
+            week2_list = cursor.fetchall()
+            meal = -1
+            for recipe in week1_list:
+                meal += 1
+                shop_tree.insert(
+                    "shop_dir 3", "end", text=week1_list[meal][0],
+                )
+            meal = -1
+            for recipe in week2_list:
+                meal += 1
+                shop_tree.insert(
+                    "shop_dir 4", "end", text=week2_list[meal][0],
+                )
+
+            # Artikel einsetzen
+            con = sqlite3.connect("family_data.db")
+            cursor = con.cursor()
+            cursor.execute("SELECT * FROM shop_items",)
+            shop_item = cursor.fetchall()
+
+            # print(shop_item)
+            item_count = -1
+            for items in shop_item:
+                item_count += 1
+
+                try:
+                    cursor.execute(
+                        "SELECT dir FROM shop_cat WHERE name_shop_cat = ?",
+                        (shop_item[item_count][5],),
+                    )
+                    shop_item_cat = cursor.fetchall()
+                    # print(shop_item_cat)
+
+                    item = shop_tree.insert(
+                        shop_item_cat[0],
+                        "end",
+                        shop_item[item_count][5],
+                        text=shop_item[item_count][1],
+                    )
+                except:
+                    cursor.execute(
+                        "SELECT sub1 FROM shop_cat WHERE name_shop_cat = ?",
+                        (shop_item[item_count][5],),
+                    )
+                    shop_item_main = str(cursor.fetchall())[3:-4]
+                    # print(shop_item_main)
+
+                    item = shop_tree.insert(
+                        shop_item_main,
+                        "end",
+                        shop_item[item_count][4],
+                        text=shop_item[item_count][1],
+                        values=[
+                            str(shop_item[item_count][2])
+                            + str(shop_item[item_count][3])
+                        ],
+                    )
+            cursor.close()
+            con.close()
+
+            shop_tree.pack(side="right", anchor="nw", fill="both", expand=True)
+
+        # shopping_list()
+        shopping_tree()
 
     # ANCHOR Rezepte
     def recipes(self):
@@ -248,9 +376,11 @@ class Tabs:
         global recipes_tree, selection_rec
         tab = 6
 
+        # Frame in Tab erzeugen
         rec_frame_buttons = tk.Frame(self.tab6)
         rec_frame_buttons.pack(side="right", anchor="e", fill="y")
 
+        # Sidebar Buttons erzeugen
         for txt, col, val in config.sidebar_buttons[tab]:
             Button(
                 rec_frame_buttons,
@@ -262,7 +392,7 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 Treeview."""
-
+        # Tree erzeugen
         def recipes_tree():
             global tree, scbTree, recipe, categorie, index, rec_cat, selection_rec
             tree = ttk.Treeview(self.tab6, columns=(config.recipe[1]))
@@ -275,7 +405,6 @@ class Tabs:
                 global selection_rec
                 for item in tree.selection():
                     selection_rec = tree.item(item, "text")
-                    # print(selection_rec)
 
             tree.bind("<<TreeviewSelect>>", on_tree_select)
 
@@ -330,7 +459,6 @@ class Tabs:
                     config.recipe[6][categorie],
                     text=config.recipe[5][categorie],
                 )
-                # print(rec_cat)
                 cursor.close()
                 con.close()
 
@@ -345,7 +473,6 @@ class Tabs:
                         text=rec_cat[index][2],
                         values=[
                             rec_cat[index][6],
-                            # rec_cat[index][7],
                             rec_cat[index][7] or rec_cat[index][8],
                         ],
                     )
@@ -365,20 +492,12 @@ class Tabs:
         """Tab6 Meal Sidebar."""
         global this_week, next_week, button_identities, change, bname, bcount1, n, identities_reset
         tab = 7
-        button_identities = []
 
-        def identities_reset():
-            del button_identities[:14]
-
-        def change(n):
-            global bname, bcount1
-            bname = button_identities[n]
-            bcount1 = []
-            bcount1.append(n + 1)
-
+        # Frame in Tab erzeugen
         meal_frame_buttons = tk.Frame(self.tab7)
         meal_frame_buttons.pack(side="right", anchor="e", fill="y")
 
+        # Sidebar Buttons erzeugen
         for txt, col, val in config.sidebar_buttons[tab]:
             Button(
                 meal_frame_buttons,
@@ -392,7 +511,19 @@ class Tabs:
         """Tab6 Days."""
         v = IntVar()
         v.set(0)
+        button_identities = []
 
+        # Rückgabe für Wochentagbestimmung
+        def identities_reset():
+            del button_identities[:14]
+
+        def change(n):
+            global bname, bcount1
+            bname = button_identities[n]
+            bcount1 = []
+            bcount1.append(n + 1)
+
+        # Anzeige Wochentage
         day_frame = tk.Frame(self.tab7)
         day_frame.pack(side="left", fill="both", expand=True)
         Label1 = Label(
@@ -404,11 +535,13 @@ class Tabs:
 
         """Tab6 Frame this week."""
 
+        # aktuelle Woche
         def this_week():
             global this_week_frame
             i = 0
             week1_list = []
 
+            # Frame
             this_week_frame = tk.Frame(self.tab7)
             this_week_frame.pack(side="left", fill="y", expand=True)
             Label2 = Label(
@@ -419,6 +552,7 @@ class Tabs:
                 font="Times 24 bold",
             ).pack()
 
+            # Buttons
             for txt in config.meal[1]:
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
@@ -448,11 +582,13 @@ class Tabs:
 
         """Tab6 Frame next week."""
 
+        # nächste Woche
         def next_week():
             global next_week_frame
             i = 7
             week2_list = []
 
+            # Frame
             next_week_frame = tk.Frame(self.tab7)
             next_week_frame.pack(side="left", fill="y", expand=True)
             Label3 = Label(
@@ -463,6 +599,7 @@ class Tabs:
                 font="Times 24 bold",
             ).pack()
 
+            # Buttons
             for txt in config.meal[1]:
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
@@ -540,8 +677,8 @@ Tab = Tabs()
 
 # SECTION Fenster
 def top_window(args):
-    global refresh
     """Create Toplevel Windows."""
+    global refresh
     # SECTION Overview
     if args >= 1 and args < 7:
         if args == 1:
@@ -947,110 +1084,311 @@ def top_window(args):
                 print("Termin nicht gelöscht")
     # SECTION Shopping
     elif args >= 25 and args < 31:
+        # ANCHOR neue/r Kategorie/Artikel
         if args == 25:
-            """Rezept anzeigen."""
-            recipe_view = Toplevel()
-            recipe_view.title(config.sidebar_buttons[5][0][0])
-            recipe_view.geometry("+%d+%d" % (400, 200))
-            rec_view_label1 = tk.Label(recipe_view, text="Rezept:").grid(
-                column=1, row=1
-            )
-            rec_view_label2 = tk.Label(recipe_view, text="Zutaten:").grid(
-                column=1, row=2
-            )
-            rec_view_label3 = tk.Label(recipe_view, text="Anleitung:").grid(
-                column=1, row=3
-            )
+            """neue/r Kategorie/Artikel."""
+            shop_new_cat = Toplevel()
+            shop_new_cat.title(config.sidebar_buttons[5][0][0])
+            shop_new_cat.geometry("+%d+%d" % (400, 200))
 
-            rec_view_entry1 = tk.Entry(recipe_view).grid(column=2, row=1)
-            rec_view_entry2 = tk.Entry(recipe_view).grid(column=2, row=2)
-            rec_view_entry3 = tk.Entry(recipe_view).grid(column=2, row=3)
+            # Eingabe in Variable speichern
+            shop_cat_new = StringVar()
+            shop_Categorie = StringVar()
+            shop_Size = StringVar()
+            shop_Measurement = StringVar()
+            shop_Measurement.set(config.shop[13][0])
 
-            rec_view_button1 = tk.Button(recipe_view, text="OK").grid(column=1, row=4)
-            rec_view_button2 = tk.Button(
-                recipe_view, text="Abbrechen", command=recipe_view.destroy
-            ).grid(column=2, row=4)
+            # neue Kategorie in Datenbank schreiben
+            def commit():
+                shop_cat = shop_Categorie.get()
+
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+
+                # Neue Katekorie
+                if shop_Size.get() == "":
+                    # Erzeugt Hauptkategorie
+                    if shop_Categorie.get() == "":
+                        cursor.execute("SELECT max(id_shop_cat) FROM shop_cat")
+                        max_id_shop = cursor.fetchone()[-1]
+                        new_categorie_shop = shop_cat_new.get()
+                        try:
+                            iD = int(max_id_shop) + 1
+                            Dir = "shop_dir" + str((max_id_shop + 2))
+                            Sub1 = "shop_dir " + str((max_id_shop + 2))
+                            Sub2 = "shop_dir  " + str((max_id_shop + 2))
+                            Sub3 = "shop_dir   " + str((max_id_shop + 2))
+                            Main = shop_Categorie.get()
+                        except TypeError:
+                            iD = 1
+                            Dir = "shop_dir2"
+                            Sub1 = "shop_dir 2"
+                            Sub2 = "shop_dir  2"
+                            Sub3 = "shop_dir   2"
+                            Main = shop_Categorie.get()
+                        cursor.execute(
+                            "INSERT INTO shop_cat(id_shop_cat, name_shop_cat, dir, sub1, sub2, sub3, main) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                            (iD, new_categorie_shop, Dir, Sub1, Sub2, Sub3, Main),
+                        )
+                    # Erzeugt Unterkategorie
+                    else:
+                        cursor.execute("SELECT max(id_shop_cat) FROM shop_cat")
+                        max_id_shop = cursor.fetchone()[-1]
+                        new_categorie_shop = shop_cat_new.get()
+                        iD = int(max_id_shop) + 1
+                        Dir = "shop_dir" + str((max_id_shop + 2))
+                        Sub1 = "shop_dir " + str((max_id_shop + 2))
+                        Sub2 = "shop_dir  " + str((max_id_shop + 2))
+                        Sub3 = "shop_dir   " + str((max_id_shop + 2))
+                        Main = str(shop_Categorie.get())[2:-3]
+                        cursor.execute(
+                            "INSERT INTO shop_cat(id_shop_cat, name_shop_cat, dir, sub1, sub2, sub3, main) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                            (iD, new_categorie_shop, Dir, Sub1, Sub2, Sub3, Main),
+                        )
+                # Neuer Artikel
+                else:
+                    cursor.execute("SELECT max(id_shop_item) FROM shop_items")
+                    max_id_item = cursor.fetchone()[-1]
+                    new_item_shop = shop_cat_new.get()
+                    new_size_shop = shop_Size.get()
+                    new_measurement = shop_Measurement.get()
+                    try:
+                        iD = int(max_id_item) + 1
+                        item_Dir = "item_Dir" + str((max_id_item + 2))
+                        item_Main = str(shop_Categorie.get())[2:-3]
+                    except TypeError:
+                        iD = 1
+                        item_Dir = "item_Dir2"
+                        item_Main = str(shop_Categorie.get())[2:-3]
+                    cursor.execute(
+                        "INSERT INTO shop_items(id_shop_item, item_name, item_size, item_measurement, item_dir, item_main) VALUES(?, ?, ?, ?, ?, ?)",
+                        (
+                            iD,
+                            new_item_shop,
+                            new_size_shop,
+                            new_measurement,
+                            item_Dir,
+                            item_Main,
+                        ),
+                    )
+                    # print("Artikel")
+
+                con.commit()
+                cursor.close()
+                con.close()
+                shop_new_cat.destroy()
+
+            # bei Bestätigung mit Enter
+            def entry_return(event):
+                commit()
+                refresh()
+
+            # Dropdown Menü Einträge
+            con = sqlite3.connect("family_data.db")
+            cursor = con.cursor()
+            shop_categ = "SELECT name_shop_cat FROM shop_cat"
+            cursor.execute(shop_categ)
+            shop_optionList = []
+            # shop_optionList = sorted(shop_optionList)
+            for shop_cat in cursor:
+                shop_optionList.append(shop_cat)
+            cursor.close()
+            con.close()
+
+            # Anzeige "Neue Kategorie"
+            shop_new_cat_label = tk.Label(
+                shop_new_cat, text="Neue(r) Kategorie/Artikel:"
+            )
+            shop_new_cat_label.grid(column=1, row=1)
+
+            shop_new_cat_entry = tk.Entry(shop_new_cat, textvariable=shop_cat_new)
+            shop_new_cat_entry.grid(column=1, row=2)
+            shop_new_cat_entry.focus()
+            shop_new_cat_entry.bind("<Return>", entry_return)
+
+            # Anzeige Kategorie
+            lbCategorie = tk.Label(shop_new_cat, text="Kategorie:")
+            lbCategorie.grid(column=2, row=1)
+            txCategorie = tk.OptionMenu(
+                shop_new_cat, shop_Categorie, *sorted(shop_optionList[3:])
+            )
+            # txCategorie.sort(a)
+            txCategorie.grid(column=2, row=2)
+
+            # Anzeige "Packungsgröße"
+            shop_measurement_label = tk.Label(
+                shop_new_cat, text="Inhalt von 1 Packung:"
+            )
+            shop_measurement_label.grid(column=1, row=3, columnspan=2)
+
+            shop_measurement_entry = tk.Entry(shop_new_cat, textvariable=shop_Size)
+            shop_measurement_entry.grid(column=1, row=4)
+            shop_measurement_entry.focus()
+            shop_measurement_entry.bind("<Return>", entry_return)
+            shop_measurement_dropdown = tk.OptionMenu(
+                shop_new_cat, shop_Measurement, *config.shop[13]
+            )
+            shop_measurement_dropdown.grid(column=2, row=4)
+
+            # Buttons erzeugen
+            shop_new_cat_button1 = tk.Button(
+                shop_new_cat, text="OK", command=lambda: [commit(), refresh()]
+            )
+            shop_new_cat_button1.grid(column=1, row=5)
+            shop_new_cat_button2 = tk.Button(
+                shop_new_cat, text="Abbrechen", command=shop_new_cat.destroy
+            )
+            shop_new_cat_button2.grid(column=2, row=5)
+        # TODO Artikel einkaufen
         elif args == 26:
-            """zu Essensplan."""
-            recipe_add = Toplevel()
-            recipe_add.title(config.sidebar_buttons[5][1][0])
-            recipe_add.geometry("+%d+%d" % (400, 200))
+            """neuer Artikel."""
+            # global item_pieces
+            shop_new_item = Toplevel()
+            shop_new_item.title(config.sidebar_buttons[5][0][0])
+            shop_new_item.geometry("+%d+%d" % (400, 200))
 
-            v = IntVar()
-            v.set(1)
+            # Selektion Rückgabewert
+            def on_tree_select(self):
+                global selection_shop
+                for item in shop_tree.selection():
+                    selection_shop = shop_tree.item(item, "text")
+                    print(selection_shop)
 
-            Label(
-                recipe_add, text="Wähle einen Wochentag:", justify=LEFT, padx=20,
-            ).pack()
+            shop_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
-            for txt, val in config.meal[0]:
-                Radiobutton(
-                    recipe_add,
-                    text=txt,
-                    indicatoron=0,
-                    width=20,
-                    padx=20,
-                    variable=v,
-                    command=recipe_add.destroy,
-                    value=val,
-                ).pack(anchor=W)
+            # Eingabe in Variable speichern
+            # shop_item_new = StringVar()
+            # shop_Item = StringVar()
+            item_pieces = IntVar()
+
+            # neue Kategorie in Datenbank schreiben
+            def commit():
+                # shop_item = shop_Item.get()
+
+                con = sqlite3.connect("family_data.db")
+                cursor = con.cursor()
+
+                # if shop_Item.get() == "":
+                # print("Shop_cat: ", shop_cat)
+                # print("Shop_categorie: ", shop_Categorie.get())
+                cursor.execute(
+                    "SELECT * FROM shop_items WHERE item_name = ?", (selection_shop,)
+                )
+                item_shop = cursor.fetchone()
+                print(item_shop)
+
+                con.commit()
+                cursor.close()
+                con.close()
+
+                shop_list.insert(
+                    END,
+                    str(selection_shop)
+                    + "     "
+                    + item_pieces.get()
+                    + "x  ("
+                    + str(int(item_pieces.get()) * int(item_shop[2]))
+                    + " "
+                    + str(item_shop[3])
+                    + ")",
+                )
+
+                shop_new_item.destroy()
+
+            # bei Bestätigung mit Enter
+            def entry_return(event):
+                commit()
+                refresh()
+
+            # # Dropdown Menü Einträge
+            # con = sqlite3.connect("family_data.db")
+            # cursor = con.cursor()
+            # shop_categ = "SELECT name_shop_cat FROM shop_cat"
+            # cursor.execute(shop_categ)
+            # shop_optionList = []
+            # for shop_cat in cursor:
+            #     shop_optionList.append(shop_cat)
+            # cursor.close()
+            # con.close()
+
+            # # Anzeige "Neue Kategorie"
+            # shop_new_cat_label = tk.Label(shop_new_cat, text="Neue Kategorie:")
+            # shop_new_cat_label.grid(column=1, row=1)
+
+            # shop_new_cat_entry = tk.Entry(shop_new_cat, textvariable=shop_cat_new)
+            # shop_new_cat_entry.grid(column=1, row=2)
+            # shop_new_cat_entry.focus()
+            # shop_new_cat_entry.bind("<Return>", entry_return)
+
+            # # Anzeige Kategorie
+            # lbCategorie = tk.Label(shop_new_cat, text="Kategorie:")
+            # lbCategorie.grid(column=2, row=1)
+            # txCategorie = tk.OptionMenu(
+            #     shop_new_cat, shop_Categorie, *shop_optionList[3:]
+            # )
+            # txCategorie.grid(column=2, row=2)
+
+            # Buttons erzeugen
+            item_pieces = tk.Spinbox(shop_new_item, from_=1, to=20)
+            item_pieces.grid(column=1, row=1, columnspan=2)
+            shop_new_item_button1 = tk.Button(
+                shop_new_item, text="OK", command=lambda: [commit(), refresh()]
+            )
+            shop_new_item_button1.grid(column=1, row=3)
+            shop_new_item_button2 = tk.Button(
+                shop_new_item, text="Abbrechen", command=shop_new_item.destroy
+            )
+            shop_new_item_button2.grid(column=2, row=3)
+        # TODO Artikel Menge ändern
         elif args == 27:
-            """neue Kategorie."""
-            categorie_new = Toplevel()
-            categorie_new.title(config.sidebar_buttons[5][2][0])
-            categorie_new.geometry("+%d+%d" % (400, 200))
-            cat_new_label = tk.Label(categorie_new, text="Neue Kategorie:").grid(
-                column=1, row=1
+            """Rezept löschen."""
+            recipe_del = tk.messagebox.askquestion(
+                config.sidebar_buttons[5][5][0],
+                "Möchtest du das Rezept wirklich löschen?",
+                icon="warning",
             )
-            cat_new_entry = tk.Entry(categorie_new).grid(column=2, row=1)
-            cat_new_button1 = tk.Button(categorie_new, text="OK").grid(column=1, row=2)
-            cat_new_button2 = tk.Button(
-                categorie_new, text="Abbrechen", command=categorie_new.destroy
-            ).grid(column=2, row=2)
+            if recipe_del == "yes":
+                print("Rezept gelöscht")
+            else:
+                print("Rezept nicht gelöscht")
+        # ANCHOR Artikel löschen
         elif args == 28:
-            """neues Rezept."""
-            recipe_new = Toplevel()
-            recipe_new.title(config.sidebar_buttons[5][3][0])
-            recipe_new.geometry("+%d+%d" % (400, 200))
-            rec_new_label1 = tk.Label(recipe_new, text="Neues Rezept:").grid(
-                column=1, row=1
+            """Artikel löschen."""
+            # Messagebox mit Ja/Nein erzeugen
+            shop_del = tk.messagebox.askquestion(
+                config.sidebar_buttons[5][3][0],
+                "Möchtest du den ausgewählten Artikel wirklich von der Einkaufsliste löschen?",
+                icon="warning",
             )
-            rec_new_label2 = tk.Label(recipe_new, text="Zutaten:").grid(column=1, row=2)
-            rec_new_label3 = tk.Label(recipe_new, text="Anleitung:").grid(
-                column=1, row=3
-            )
-
-            rec_new_entry1 = tk.Entry(recipe_new).grid(column=2, row=1)
-            rec_new_entry2 = tk.Entry(recipe_new).grid(column=2, row=2)
-            rec_new_entry2 = tk.Entry(recipe_new).grid(column=2, row=3)
-
-            rec_new_button1 = tk.Button(recipe_new, text="OK").grid(column=1, row=4)
-            rec_new_button2 = tk.Button(
-                recipe_new, text="Abbrechen", command=recipe_new.destroy
-            ).grid(column=2, row=4)
+            # Artikel löschen
+            if shop_del == "yes":
+                if shop_list.get(tk.ANCHOR) != "":
+                    shop_list.delete(tk.ANCHOR)
+                else:
+                    tk.messagebox.showinfo(
+                        title="Löschen nicht möglich",
+                        message="Kein Artikel zum Löschen ausgewählt",
+                    )
+        # ANCHOR Liste löschen
         elif args == 29:
-            """Rezept ändern."""
-            recipe_edit = Toplevel()
-            recipe_edit.title(config.sidebar_buttons[5][4][0])
-            recipe_edit.geometry("+%d+%d" % (400, 200))
-            rec_edit_label1 = tk.Label(recipe_edit, text="Rezept:").grid(
-                column=1, row=1
+            """Liste leeren."""
+            # Messagebox mit Ja/Nein erzeugen
+            shop_del = tk.messagebox.askquestion(
+                config.sidebar_buttons[5][4][0],
+                "Möchtest du die Einkaufsliste wirklich leeren?",
+                icon="warning",
             )
-            rec_edit_label2 = tk.Label(recipe_edit, text="Zutaten:").grid(
-                column=1, row=2
-            )
-            rec_edit_label3 = tk.Label(recipe_edit, text="Anleitung:").grid(
-                column=1, row=3
-            )
-
-            rec_edit_entry1 = tk.Entry(recipe_edit).grid(column=2, row=1)
-            rec_edit_entry2 = tk.Entry(recipe_edit).grid(column=2, row=2)
-            rec_edit_entry3 = tk.Entry(recipe_edit).grid(column=2, row=3)
-
-            rec_edit_button1 = tk.Button(recipe_edit, text="OK").grid(column=1, row=4)
-            rec_edit_button2 = tk.Button(
-                recipe_edit, text="Abbrechen", command=recipe_edit.destroy
-            ).grid(column=2, row=4)
+            print(shop_list.get(0, tk.END))
+            # Eikaufsliste leeren
+            if shop_del == "yes":
+                if shop_list.get(0, tk.END) != ():
+                    shop_list.delete(0, tk.END)
+                else:
+                    tk.messagebox.showinfo(
+                        title="Leeren nicht möglich",
+                        message="Die Einkaufsliste ist bereits leer",
+                    )
+        # TODO drucken
         elif args == 30:
             """Rezept löschen."""
             recipe_del = tk.messagebox.askquestion(
@@ -1248,6 +1586,7 @@ def top_window(args):
             recipe_add.title(config.sidebar_buttons[6][1][0])
             recipe_add.geometry("+%d+%d" % (400, 200))
 
+            # Auswahl in Datenbank und Tab Essensplan schreiben
             def insert_weekday():
                 week_day = d.get()
                 week = w.get()
@@ -1270,8 +1609,8 @@ def top_window(args):
                         time = selection[0][6]
                         week1 = selection[0][7]
                         selection_list = [cat, name, time, week1]
-                        print("Selektion:", selection)
-                        print("Index:", index)
+                        # print("Selektion:", selection)
+                        # print("Index:", index)
 
                         con.commit()
                         cursor.close()
@@ -1371,10 +1710,6 @@ def top_window(args):
                 con.close()
                 categorie_new.destroy()
 
-            # neue Kategorie dynamisch in Tree einfügen
-            # def refresh():
-            #     tree.insert("", "end", Dir, text=cat_new.get())
-
             # bei Bestätigung mit Enter
             def entry_return(event):
                 commit()
@@ -1464,7 +1799,6 @@ def top_window(args):
                 con.close()
 
                 # # Rezept dynamisch in Treeview einfügen
-                # tree.insert(cat_dir, "end", text=Name.get(), values=[Time.get()])
                 recipe_new.destroy()
                 refresh()
 
@@ -1495,7 +1829,7 @@ def top_window(args):
             # Anzeige Kategorie
             lbCategorie = tk.Label(recipe_new, text="Kategorie:")
             lbCategorie.place(x=10, y=40)
-            txCategorie = tk.OptionMenu(recipe_new, Categorie, *OptionList)
+            txCategorie = tk.OptionMenu(recipe_new, Categorie, *sorted(OptionList))
             txCategorie.place(x=90, y=35)
 
             # Anzeige Dauer
@@ -1559,6 +1893,7 @@ def top_window(args):
         elif args == 35:
             """Rezept ändern."""
             global meal_day, Meal
+
             # Fenster erzeugen
             recipe_edit = Toplevel()
             recipe_edit.title(config.sidebar_buttons[6][0][0])
@@ -1791,8 +2126,8 @@ def top_window(args):
             txRecipe.pack(side="left")
             scbRecipe.pack(side="left", fill="y")
 
+            # Rückgabewerte automatisch anzeigen
             try:
-                # Rückgabewerte automatisch anzeigen
                 categorie()
                 time()
                 name()
@@ -1849,12 +2184,14 @@ def top_window(args):
         # ANCHOR Essen hinzufügen
         if args == 37:
             """Essen hinzufügen."""
+            # Fenster erzeugen
             meal_add = Toplevel()
             meal_add.title(config.sidebar_buttons[7][0][0])
             meal_add.geometry("+%d+%d" % (250, 50))
             meal_add["height"] = 480
             meal_add["width"] = 600
 
+            # Abfrage ob Auswahl/Essen vorhanden
             try:
                 if bname != "":
                     tk.messagebox.showinfo(
@@ -1867,6 +2204,7 @@ def top_window(args):
                     categorie = 0
                     recipe = 0
 
+                    # Auswahl einsetzen
                     def meal_replace():
                         del button_identities[bcount1[0]]
                         button_identities.insert(bcount1[0], selection_meal)
@@ -1910,7 +2248,7 @@ def top_window(args):
                         global selection_meal
                         for item in tree.selection():
                             selection_meal = tree.item(item, "text")
-                            print(selection_meal)
+                            # print(selection_meal)
 
                     tree.bind("<<TreeviewSelect>>", on_tree_select)
 
@@ -1982,12 +2320,14 @@ def top_window(args):
         # ANCHOR Essen ändern
         elif args == 38:
             """Essen ändern."""
+            # Messagebox mit Ja/Nein erzeugen
             meal_edit = Toplevel()
             meal_edit.title(config.sidebar_buttons[7][1][0])
             meal_edit.geometry("+%d+%d" % (250, 50))
             meal_edit["height"] = 480
             meal_edit["width"] = 600
 
+            # Abfrage ob Auswahl/Essen vorhanden
             try:
                 if bname == "":
                     tk.messagebox.showinfo(
@@ -2000,6 +2340,7 @@ def top_window(args):
                     categorie = 0
                     recipe = 0
 
+                    # Essen ersetzen
                     def meal_change():
                         del button_identities[bcount1[0]]
                         button_identities.insert(bcount1[0], selection_meal)
@@ -2061,7 +2402,7 @@ def top_window(args):
                         global selection_meal
                         for item in tree.selection():
                             selection_meal = tree.item(item, "text")
-                            print(selection_meal)
+                            # print(selection_meal)
 
                     tree.bind("<<TreeviewSelect>>", on_tree_select)
 
@@ -2132,7 +2473,8 @@ def top_window(args):
             buClose.place(x=420, y=445)
         # ANCHOR Rezept anzeigen
         elif args == 39:
-            """?."""
+            """Rezept anzeigen."""
+            # Fenster erzeugen
             meal_del = Toplevel()
             meal_del.title(config.sidebar_buttons[7][2][0])
             meal_del.geometry("+%d+%d" % (250, 50))
@@ -2308,16 +2650,19 @@ def top_window(args):
         # ANCHOR Essen löschen
         elif args == 40:
             """Einzelnen Tag löschen."""
+            # Messagebox mit Ja/Nein erzeugen
             day_del = tk.messagebox.askquestion(
                 config.sidebar_buttons[7][3][0],
                 "Möchtest du das Essen wirklich löschen?",
                 icon="warning",
             )
+
+            # Essen aus Datenbank entfernen
             if day_del == "yes":
                 try:
                     con = sqlite3.connect("family_data.db")
                     cursor = con.cursor()
-                    print(bname)
+                    # print(bname)
                     cursor.execute(
                         "UPDATE rec_recipe SET week1 = ? WHERE name = ?", ("", bname,)
                     )
@@ -2325,8 +2670,8 @@ def top_window(args):
                         "UPDATE rec_recipe SET week2 = ? WHERE name = ?", ("", bname,)
                     )
                     con.commit()
-                    print("Bname:", bname)
-                    print("Essen gelöscht")
+                    # print("Bname:", bname)
+                    # print("Essen gelöscht")
                     cursor.close()
                     con.close()
                     identities_reset()
@@ -2341,6 +2686,7 @@ def top_window(args):
         # ANCHOR Woche 1 löschen
         elif args == 41:
             """Woche 1 löschen."""
+            # Messagebox mit Ja/Nein erzeugen
             week1_del = tk.messagebox.askquestion(
                 config.sidebar_buttons[7][4][0],
                 "Möchtest du Woche 1 wirklich löschen?",
@@ -2362,6 +2708,7 @@ def top_window(args):
         # ANCHOR Woche 2 löschen
         elif args == 42:
             """Woche 2 löschen."""
+            # Messagebox mit Ja/Nein erzeugen
             week2_del = tk.messagebox.askquestion(
                 config.sidebar_buttons[7][5][0],
                 "Möchtest du Woche 2 wirklich löschen?",
@@ -2474,7 +2821,7 @@ def top_window(args):
 
 
 def top_config(self):
-    """?."""
+    """Menüband Optionen."""
     config_window = Toplevel()
     config_window.title("Konfiguration")
     config_window.geometry("+%d+%d" % (400, 200))
@@ -2494,8 +2841,15 @@ def fullscreen_toggle(self):
 
 
 def refresh():
+    """Anzeige aktualisieren."""
     importlib.reload(config)
-    identities_reset()
+
+    # Einkaufen
+    shop_tree.destroy()
+    scbTreeShop.destroy()
+    # shop_list.destroy()
+    shopping_tree()
+    # shopping_list()
 
     # Rezepte
     tree.destroy()
@@ -2503,6 +2857,7 @@ def refresh():
     recipes_tree()
 
     # Essensplan
+    identities_reset()
     this_week_frame.destroy()
     next_week_frame.destroy()
     this_week()

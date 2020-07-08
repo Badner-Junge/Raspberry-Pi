@@ -44,6 +44,7 @@ def sidebar_buttons():
     """Config Sidebar Buttonname, Buttoncolor, Toplevel."""
     config_buttons = [14, "Times 12 bold"]  # width  # font, size
 
+    # Übersicht
     view_buttons = [
         ("view1", "grey", lambda: top_window(1)),
         ("view2", "grey", lambda: top_window(2)),
@@ -53,6 +54,7 @@ def sidebar_buttons():
         ("view6", "grey", lambda: top_window(6)),
     ]
 
+    # To-Do
     todo_buttons = [
         ("Katja", "green", lambda: top_window(7)),
         ("Fabian", "green", lambda: top_window(8)),
@@ -62,6 +64,7 @@ def sidebar_buttons():
         ("Jona", "beige", lambda: top_window(12)),
     ]
 
+    # Kinder
     kids_buttons = [
         ("Kinder 1", "purple", lambda: top_window(13)),
         ("Kinder 2", "white", lambda: top_window(14)),
@@ -71,6 +74,7 @@ def sidebar_buttons():
         ("Kinder 6", "brown", lambda: top_window(18)),
     ]
 
+    # Kalender
     calendar_buttons = [
         ("Terminübersicht", "yellow", lambda: top_window(19)),
         ("Termin anzeigen", "yellow", lambda: top_window(20)),
@@ -80,15 +84,17 @@ def sidebar_buttons():
         ("Termin löschen", "red", lambda: top_window(24)),
     ]
 
+    # Einkaufen
     shopping_buttons = [
-        ("Artikel hinzufügen", "lightgreen", lambda: top_window(25)),
-        ("Rezept hinzufügen", "lightgreen", lambda: top_window(26)),
-        ("Menge ändern", "orange", lambda: top_window(27)),
-        ("Artikel löschen", "red", lambda: top_window(28)),
-        ("Liste löschen", "red", lambda: top_window(29)),
+        ("neue Kategorie\nneuer Artikel", "lightgreen", lambda: top_window(25)),
+        ("Artikel\neinkaufen", "lightgreen", lambda: top_window(26)),
+        ("Artikel\nMenge ändern", "orange", lambda: top_window(27)),
+        ("Artikel aus Liste\nlöschen", "red", lambda: top_window(28)),
+        ("ganze Liste\n löschen", "red", lambda: top_window(29)),
         ("Drucken", "blue", lambda: top_window(30)),
     ]
 
+    # Rezepte
     recipes_buttons = [
         ("Rezept anzeigen", "yellow", lambda: top_window(31)),
         ("zum Essensplan", "lightgreen", lambda: top_window(32)),
@@ -98,6 +104,7 @@ def sidebar_buttons():
         ("Rezept löschen", "red", lambda: top_window(36)),
     ]
 
+    # Essensplan
     meal_buttons = [
         ("Essen hinzufügen", "lightgreen", lambda: top_window(37)),
         ("Essen ändern", "orange", lambda: top_window(38)),
@@ -107,6 +114,7 @@ def sidebar_buttons():
         ("Woche 2 löschen", "red", lambda: top_window(42)),
     ]
 
+    # Haushaltsbuch
     household_buttons = [
         ("Einnahme", "green", lambda: top_window(43)),
         ("Ausgabe", "red", lambda: top_window(44)),
@@ -154,29 +162,146 @@ def calendar():
 
 def shop():
     """Config Recipe Treeview."""
-    shop_one_width = 70
-    shop_one_name = ""
-    shop_one_sub = "Schnitzel"
-    shop_one_values = ""
-    shop_two_width = 70
-    shop_two_name = ""
-    shop_two_sub = "Paprika"
-    shop_two_values = ""
-    shop_three_width = 70
-    shop_three_name = ""
-    shop_three_sub = "Essen1"
-    shop_three_values = ""
+    con = sqlite3.connect("family_data.db")
+    cursor = con.cursor()
+    id_shop = "SELECT id_shop_cat FROM shop_cat"
+    cursor.execute(id_shop)
+    id_shop_list = []
+    for id_cat in cursor:
+        id_shop_list.append(id_cat)
+    cursor.close()
 
-    shop_one = [shop_one_width, shop_one_name, shop_one_sub, shop_one_values]
-    shop_two = [shop_two_width, shop_two_name, shop_two_sub, shop_two_values]
-    shop_three = [shop_three_width, shop_three_name, shop_three_sub, shop_three_values]
-    shop_categorie = ["Fleisch", "Gemüse", "Rezepte"]
+    cursor = con.cursor()
+    name_shop = "SELECT name_shop_cat FROM shop_cat"
+    cursor.execute(name_shop)
+    name_shop_list = []
+    for name in cursor:
+        name_shop_list.append(name)
+    cursor.close()
+
+    cursor = con.cursor()
+    dir_shop = "SELECT dir FROM shop_cat"
+    cursor.execute(dir_shop)
+    dir_shop_list = []
+    for Dir in cursor:
+        dir_shop_list.append(Dir)
+    cursor.close()
+
+    cursor = con.cursor()
+    sub1_shop = "SELECT sub1 FROM shop_cat"
+    cursor.execute(sub1_shop)
+    sub1_shop_list = []
+    for sub1 in cursor:
+        sub1_shop_list.append(sub1)
+    cursor.close()
+
+    cursor = con.cursor()
+    sub2_shop = "SELECT sub2 FROM shop_cat"
+    cursor.execute(sub2_shop)
+    sub2_shop_list = []
+    for sub2 in cursor:
+        sub2_shop_list.append(sub2)
+    cursor.close()
+
+    cursor = con.cursor()
+    sub3_shop = "SELECT sub3 FROM shop_cat"
+    cursor.execute(sub3_shop)
+    sub3_shop_list = []
+    for sub3 in cursor:
+        sub3_shop_list.append(sub3)
+    cursor.close()
+
+    cursor = con.cursor()
+    main_shop = "SELECT main FROM shop_cat"
+    cursor.execute(main_shop)
+    main_shop_list = []
+    for main in cursor:
+        main_shop_list.append(main)
+    cursor.close()
+
+    cursor = con.cursor()
+    id_shop_item = "SELECT id_shop_item FROM shop_items"
+    cursor.execute(id_shop_item)
+    id_shop_item_list = []
+    for item in cursor:
+        id_shop_item_list.append(item)
+    cursor.close()
+
+    cursor = con.cursor()
+    name_shop_item = "SELECT item_name FROM shop_items"
+    cursor.execute(name_shop_item)
+    name_shop_item_list = []
+    for name in cursor:
+        name_shop_item_list.append(name)
+    cursor.close()
+
+    cursor = con.cursor()
+    size_shop_item = "SELECT item_size FROM shop_items"
+    cursor.execute(size_shop_item)
+    size_shop_item_list = []
+    for size in cursor:
+        size_shop_item_list.append(size)
+    cursor.close()
+
+    cursor = con.cursor()
+    measurement_shop_item = "SELECT item_measurement FROM shop_items"
+    cursor.execute(measurement_shop_item)
+    measurement_shop_item_list = []
+    for measurement in cursor:
+        measurement_shop_item_list.append(measurement)
+    cursor.close()
+
+    cursor = con.cursor()
+    dir_shop_item = "SELECT item_dir FROM shop_items"
+    cursor.execute(dir_shop_item)
+    dir_shop_item_list = []
+    for dir_item in cursor:
+        dir_shop_item_list.append(dir_item)
+    cursor.close()
+
+    cursor = con.cursor()
+    main_shop_item = "SELECT item_main FROM shop_items"
+    cursor.execute(main_shop_item)
+    main_shop_item_list = []
+    for main_item in cursor:
+        main_shop_item_list.append(main_item)
+    cursor.close()
+
+    measurementList = ["ml", "l", "g", "kg", "Stück"]
+
+    cursor = con.cursor()
+    buy_shop_item = "SELECT item_buy FROM shop_items"
+    cursor.execute(buy_shop_item)
+    buy_shop_item_list = []
+    for buy_item in cursor:
+        buy_shop_item_list.append(buy_item)
+    cursor.close()
+
+    cursor = con.cursor()
+    pieces_shop_item = "SELECT item_pieces FROM shop_items"
+    cursor.execute(pieces_shop_item)
+    pieces_shop_item_list = []
+    for pieces_item in cursor:
+        pieces_shop_item_list.append(pieces_item)
+    cursor.close()
 
     return (
-        shop_one,
-        shop_two,
-        shop_three,
-        shop_categorie,
+        id_shop_list,  # 0
+        name_shop_list,  # 1
+        dir_shop_list,  # 2
+        sub1_shop_list,  # 3
+        sub2_shop_list,  # 4
+        sub3_shop_list,  # 5
+        main_shop_list,  # 6
+        id_shop_item_list,  # 7
+        name_shop_item_list,  # 8
+        size_shop_item_list,  # 9
+        measurement_shop_item_list,  # 10
+        dir_shop_item_list,  # 11
+        main_shop_item_list,  # 12
+        measurementList,  # 13
+        buy_shop_item_list,  # 14
+        pieces_shop_item_list,  # 15
     )
 
 
