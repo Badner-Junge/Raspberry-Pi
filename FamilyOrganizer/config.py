@@ -39,6 +39,10 @@ def style():
     treeStyle = ttk.Style()
     treeStyle.configure("Treeview", rowheight=50, font="Times 18")
 
+    """Config Spinbox."""
+    spinStyle = ttk.Style()
+    spinStyle.configure("TSpinbox", arrowsize=35)
+
 
 def sidebar_buttons():
     """Config Sidebar Buttonname, Buttoncolor, Toplevel."""

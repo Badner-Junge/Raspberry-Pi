@@ -11,6 +11,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from config import *
 from functools import partial
+from tkinter import font
 import config, datetime, tkcalendar, tkinter.messagebox, time, sys, threading, sqlite3
 import tkinter as tk
 
@@ -223,9 +224,7 @@ class Tabs:
 
         """Tab5 Listbox."""
 
-        # def shopping_list():
-        #     global shop_list
-        shop_list = tk.Listbox(self.tab5)
+        shop_list = tk.Listbox(self.tab5, font="Times 18")
         shop_list.pack(side="right", fill="both", expand=True)
 
         """Tab5 Treeview."""
@@ -235,7 +234,6 @@ class Tabs:
             shop_tree = ttk.Treeview(self.tab5, show="tree", columns=("Test"))
             shop_tree.column("Test", width=10)
             shop_tree.heading("Test", text="Test")
-            # column = 0
             categorie = 0
             recipe = 0
 
@@ -1257,20 +1255,13 @@ def top_window(args):
             shop_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
             # Eingabe in Variable speichern
-            # shop_item_new = StringVar()
-            # shop_Item = StringVar()
             item_pieces = IntVar()
 
             # neue Kategorie in Datenbank schreiben
             def commit():
-                # shop_item = shop_Item.get()
-
                 con = sqlite3.connect("family_data.db")
                 cursor = con.cursor()
 
-                # if shop_Item.get() == "":
-                # print("Shop_cat: ", shop_cat)
-                # print("Shop_categorie: ", shop_Categorie.get())
                 cursor.execute(
                     "SELECT * FROM shop_items WHERE item_name = ?", (selection_shop,)
                 )
@@ -1300,36 +1291,15 @@ def top_window(args):
                 commit()
                 refresh()
 
-            # # Dropdown Menü Einträge
-            # con = sqlite3.connect("family_data.db")
-            # cursor = con.cursor()
-            # shop_categ = "SELECT name_shop_cat FROM shop_cat"
-            # cursor.execute(shop_categ)
-            # shop_optionList = []
-            # for shop_cat in cursor:
-            #     shop_optionList.append(shop_cat)
-            # cursor.close()
-            # con.close()
-
-            # # Anzeige "Neue Kategorie"
-            # shop_new_cat_label = tk.Label(shop_new_cat, text="Neue Kategorie:")
-            # shop_new_cat_label.grid(column=1, row=1)
-
-            # shop_new_cat_entry = tk.Entry(shop_new_cat, textvariable=shop_cat_new)
-            # shop_new_cat_entry.grid(column=1, row=2)
-            # shop_new_cat_entry.focus()
-            # shop_new_cat_entry.bind("<Return>", entry_return)
-
-            # # Anzeige Kategorie
-            # lbCategorie = tk.Label(shop_new_cat, text="Kategorie:")
-            # lbCategorie.grid(column=2, row=1)
-            # txCategorie = tk.OptionMenu(
-            #     shop_new_cat, shop_Categorie, *shop_optionList[3:]
-            # )
-            # txCategorie.grid(column=2, row=2)
-
             # Buttons erzeugen
-            item_pieces = tk.Spinbox(shop_new_item, from_=1, to=20)
+            item_pieces = ttk.Spinbox(
+                shop_new_item,
+                style="TSpinbox",
+                font=font.Font(size=30),
+                width=2,
+                from_=1,
+                to=20,
+            )
             item_pieces.grid(column=1, row=1, columnspan=2)
             shop_new_item_button1 = tk.Button(
                 shop_new_item, text="OK", command=lambda: [commit(), refresh()]
