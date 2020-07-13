@@ -17,6 +17,8 @@ import tkinter as tk
 
 # import RPi.GPIO as GPIO
 import importlib
+import re
+
 
 # SECTION Tabs
 class Tabs:
@@ -206,7 +208,7 @@ class Tabs:
     # ANCHOR Einkaufen
     def shopping(self):
         """Tab5 Shopping Sidebar."""
-        global shopping_tree, shop_list
+        global shopping_tree, shop_list, recipe_list
         tab = 5
 
         shop_frame_buttons = tk.Frame(self.tab5)
@@ -223,17 +225,22 @@ class Tabs:
             ).pack(fill="y", expand=1)
 
         """Tab5 Listbox."""
+        list_frame = tk.Frame(self.tab5)
+        list_frame.pack(side="right", anchor="e", fill="both", expand=True)
 
-        shop_list = tk.Listbox(self.tab5, font="Times 18")
-        shop_list.pack(side="right", fill="both", expand=True)
+        recipe_list = tk.Listbox(list_frame, font="Times 18", height=7)
+        recipe_list.pack(side="top", anchor="e", fill="x", expand=False)
+
+        shop_list = tk.Listbox(list_frame, font="Times 18")
+        shop_list.pack(side="bottom", anchor="e", fill="both", expand=True)
 
         """Tab5 Treeview."""
 
         def shopping_tree():
             global shop_tree, scbTreeShop
-            shop_tree = ttk.Treeview(self.tab5, show="tree", columns=("Test"))
-            shop_tree.column("Test", width=10)
-            shop_tree.heading("Test", text="Test")
+            shop_tree = ttk.Treeview(self.tab5, show="tree", columns=("Ingredient"))
+            shop_tree.column("Ingredient", width=10)
+            shop_tree.heading("Ingredient", text="Ingredient")
             categorie = 0
             recipe = 0
 
@@ -305,18 +312,57 @@ class Tabs:
             cursor.execute("SELECT name FROM rec_recipe WHERE week2 != ''")
             week2_list = cursor.fetchall()
             meal = -1
+            measure = -1
+            recipe_list.delete(0, tk.END)
             for recipe in week1_list:
                 meal += 1
                 shop_tree.insert(
                     "shop_dir 3", "end", text=week1_list[meal][0],
                 )
+                cursor.execute(
+                    "SELECT ingredient FROM rec_recipe WHERE name = ?",
+                    (week1_list[meal][0],),
+                )
+                ingredient = str(cursor.fetchall())[3:-4]
+                ingredient_list = re.split("\\\\n", ingredient)
+                cursor.execute(
+                    "SELECT measurement FROM rec_recipe WHERE name = ?",
+                    (week1_list[meal][0],),
+                )
+                measurement = str(cursor.fetchall())[3:-4]
+                measurement_list = re.split("\\\\n", measurement)
+                for recipe in ingredient_list:
+                    if recipe != "":
+                        measure += 1
+                        recipe_list.insert(
+                            END, recipe + "      (" + measurement_list[measure] + ")"
+                        )
+                measure = -1
             meal = -1
             for recipe in week2_list:
                 meal += 1
                 shop_tree.insert(
                     "shop_dir 4", "end", text=week2_list[meal][0],
                 )
-
+                cursor.execute(
+                    "SELECT ingredient FROM rec_recipe WHERE name = ?",
+                    (week2_list[meal][0],),
+                )
+                ingredient = str(cursor.fetchall())[3:-4]
+                ingredient_list = re.split("\\\\n", ingredient)
+                cursor.execute(
+                    "SELECT measurement FROM rec_recipe WHERE name = ?",
+                    (week1_list[meal][0],),
+                )
+                measurement = str(cursor.fetchall())[3:-4]
+                measurement_list = re.split("\\\\n", measurement)
+                for recipe in ingredient_list:
+                    if recipe != "":
+                        measure += 1
+                        recipe_list.insert(
+                            END, recipe + "      (" + measurement_list[measure] + ")"
+                        )
+                measure = -1
             # Artikel einsetzen
             con = sqlite3.connect("family_data.db")
             cursor = con.cursor()
@@ -2810,6 +2856,14 @@ def fullscreen_toggle(self):
         self.attributes("-fullscreen", FALSE)
 
 
+def Zutaten():
+    in_str = str(config.recipe[13][0])[2:-3]
+    thelist = re.split("\\\\n", in_str)
+    print(thelist)
+    for i in thelist:
+        print(i)
+
+
 def refresh():
     """Anzeige aktualisieren."""
     importlib.reload(config)
@@ -2835,3 +2889,4 @@ def refresh():
 
     # Rückmeldung
     print("Refresh")
+    Zutaten()
